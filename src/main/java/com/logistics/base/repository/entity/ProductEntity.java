@@ -10,11 +10,12 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "products")
 public class ProductEntity extends PanacheEntity {
-    @Column(unique=true)
-    private String uuid;
-    private BigDecimal width;
-    private BigDecimal height;
-    private BigDecimal length;
-    private BigDecimal netWeight;
-    private BigDecimal grossWeight;
+  @Column(unique = true)
+  public String uuid;
+  public String name;
+  public BigDecimal width;
+  public BigDecimal height;
+  public BigDecimal length;
+  public BigDecimal netWeight;
+  public BigDecimal grossWeight;
 }
