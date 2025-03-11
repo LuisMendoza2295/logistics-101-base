@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class StorageControllerMapper {
 
     @Inject
-    ProductControllerMapper productControllerMapper;
+    StockControllerMapper stockControllerMapper;
 
     public StorageUnitDTO toStorageUnitDTO(StorageUnit storageUnit) {
         return new StorageUnitDTO(
@@ -26,24 +26,25 @@ public class StorageControllerMapper {
             storageUnit.weightOccupied(),
             storageUnit.maxUnits(),
             storageUnit.storageStatus().name(),
-            storageUnit.productsWithQty().stream()
-                .map(product -> productControllerMapper.toProductDTO(product))
+            storageUnit.stocks().stream()
+                .map(stock -> stockControllerMapper.toStockDTO(stock))
                 .collect(Collectors.toSet())
         );
     }
 
     public StorageUnit toStorageUnit(StorageUnitDTO storageUnitDTO) {
-        return new StorageUnit(
-            storageUnitDTO.uuid(),
-            storageUnitDTO.storageType(),
-            new Dimensions(
+        return StorageUnit.builder()
+            .uuid(storageUnitDTO.uuid())
+            .storageType(storageUnitDTO.storageType())
+            .dimensions(new Dimensions(
                 storageUnitDTO.width(),
                 storageUnitDTO.height(),
-                storageUnitDTO.length()),
-            storageUnitDTO.weightCapacity(),
-            storageUnitDTO.volumeOccupied(),
-            storageUnitDTO.weightOccupied(),
-            storageUnitDTO.maxUnits(),
-            storageUnitDTO.storageStatus());
+                storageUnitDTO.length()))
+            .weightCapacity(storageUnitDTO.weightCapacity())
+            .volumeOccupied(storageUnitDTO.volumeOccupied())
+            .weightOccupied(storageUnitDTO.weightOccupied())
+            .maxUnits(storageUnitDTO.maxUnits())
+            .storageStatus(storageUnitDTO.storageStatus())
+            .build();
     }
 }

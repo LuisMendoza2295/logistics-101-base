@@ -1,25 +1,22 @@
 package com.logistics.base.repository.mapper;
 
 import com.logistics.base.domain.Dimensions;
-import com.logistics.base.domain.StorageStatus;
-import com.logistics.base.domain.StorageType;
 import com.logistics.base.domain.StorageUnit;
 import com.logistics.base.repository.entity.StorageUnitEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class StorageUnitEntityMapper {
 
     @Inject
-    ProductEntityMapper productEntityMapper;
+    StockEntityMapper stockEntityMapper;
 
     public StorageUnitEntity toStorageUnitEntity(StorageUnit storageUnit) {
         StorageUnitEntity storageUnitEntity = new StorageUnitEntity();
+        storageUnitEntity.id = storageUnit.id();
         storageUnitEntity.uuid = storageUnit.uuid().toString();
         storageUnitEntity.storageType = storageUnit.storageType().name();
         storageUnitEntity.storageStatus = storageUnit.storageStatus().name();
@@ -30,33 +27,30 @@ public class StorageUnitEntityMapper {
         storageUnitEntity.volumeOccupied = storageUnit.volumeOccupied();
         storageUnitEntity.weightOccupied = storageUnit.weightOccupied();
         storageUnitEntity.maxUnits = storageUnit.maxUnits();
-        storageUnitEntity.productsWithQty = storageUnit.productsWithQty().entrySet().stream()
-            .collect(Collectors.toMap(
-                productQtyEntry -> productEntityMapper.toProductEntity(productQtyEntry.getKey()),
-                Map.Entry::getValue
-            ));
+        storageUnitEntity.stocks = storageUnit.stocks().stream()
+            .map(stock -> stockEntityMapper.toStockEntity(stock))
+            .collect(Collectors.toSet());
         return storageUnitEntity;
     }
 
     public StorageUnit toStorageUnit(StorageUnitEntity storageUnitEntity) {
-        return new StorageUnit(
-            UUID.fromString(storageUnitEntity.uuid),
-            StorageType.valueOf(storageUnitEntity.storageType),
-            new Dimensions(
+        StorageUnit.Builder builder = StorageUnit.builder()
+            .id(storageUnitEntity.id)
+            .uuid(storageUnitEntity.uuid)
+            .storageType(storageUnitEntity.storageType)
+            .dimensions(new Dimensions(
                 storageUnitEntity.width,
                 storageUnitEntity.height,
                 storageUnitEntity.length
-            ),
-            storageUnitEntity.weightCapacity,
-            storageUnitEntity.volumeOccupied,
-            storageUnitEntity.weightOccupied,
-            storageUnitEntity.maxUnits,
-            StorageStatus.valueOf(storageUnitEntity.storageStatus),
-            storageUnitEntity.productsWithQty.entrySet().stream()
-                .collect(Collectors.toMap(
-                    productQtyEntry -> productEntityMapper.toProduct(productQtyEntry.getKey()),
-                    Map.Entry::getValue
-                ))
-        );
+            ))
+            .weightCapacity(storageUnitEntity.weightCapacity)
+            .volumeOccupied(storageUnitEntity.volumeOccupied)
+            .weightOccupied(storageUnitEntity.weightOccupied)
+            .maxUnits(storageUnitEntity.maxUnits)
+            .storageStatus(storageUnitEntity.storageStatus);
+        storageUnitEntity.stocks.stream()
+            .map(stockEntity -> stockEntityMapper.toStock(stockEntity))
+            .forEach(builder::addStock);
+        return builder.build();
     }
 }

@@ -1,22 +1,22 @@
 package com.logistics.base;
 
-import com.logistics.base.domain.LogisticAggregate;
-import com.logistics.base.domain.Product;
-import com.logistics.base.domain.StorageUnit;
-import com.logistics.base.domain.Transfer;
+import com.logistics.base.domain.*;
 import com.logistics.base.repository.ProductRepository;
+import com.logistics.base.repository.StockRepository;
 import com.logistics.base.repository.StorageUnitRepository;
 import com.logistics.base.repository.entity.ProductEntity;
+import com.logistics.base.repository.entity.StockEntity;
 import com.logistics.base.repository.entity.StorageUnitEntity;
 import com.logistics.base.repository.mapper.ProductEntityMapper;
+import com.logistics.base.repository.mapper.StockEntityMapper;
 import com.logistics.base.repository.mapper.StorageUnitEntityMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,26 +26,28 @@ public class LogisticService implements LogisticAggregate {
 
     @Inject
     ProductRepository productRepository;
-
     @Inject
     StorageUnitRepository storageUnitRepository;
+    @Inject
+    StockRepository stockRepository;
 
     @Inject
     ProductEntityMapper productEntityMapper;
-
     @Inject
     StorageUnitEntityMapper storageUnitEntityMapper;
+    @Inject
+    StockEntityMapper stockEntityMapper;
 
     @Override
     public Product findByProductUuid(String uuid) {
         return productRepository.findByUuid(uuid)
             .map(productEntity -> productEntityMapper.toProduct(productEntity))
-            .orElseThrow(() -> new NotFoundException("Product with uuid " + uuid + " not found"));
+            .orElseThrow(() -> new RuntimeException("Product with uuid " + uuid + " not found"));
     }
 
     @Override
     @Transactional
-    public Product persist(Product product) {
+    public Product persistProduct(Product product) {
         if (productRepository.findByName(product.name()).isPresent()) {
             throw new RuntimeException("Product with name " + product.name() + " already exists");
         }
@@ -56,14 +58,16 @@ public class LogisticService implements LogisticAggregate {
 
     @Override
     @Transactional
-    public StorageUnit addProducts(String storageUnitUUID, Map<String, Integer> productUUIDsWithQty) {
-        Optional<StorageUnitEntity> currentStorageUnitOptional = storageUnitRepository.findByUuid(storageUnitUUID);
-        if (currentStorageUnitOptional.isEmpty()) {
+    public StorageUnit addProducts(String storageUnitUUID, Set<String> barcodes) {
+        Optional<StorageUnitEntity> currentStorageUnitEntityOptional = storageUnitRepository.findByUuid(storageUnitUUID);
+        if (currentStorageUnitEntityOptional.isEmpty()) {
             throw new RuntimeException("Storage unit with uuid " + storageUnitUUID + " not found");
         }
-        Set<ProductEntity> productEntities = new HashSet<>(productRepository.findByProductUUID(productUUIDsWithQty.keySet()));
-        StorageUnit toUpdateStorageUnit = storageUnitEntityMapper.toStorageUnit(currentStorageUnitOptional.get())
-            .addProducts(products);
+        Set<Stock> stocks = stockRepository.findByBarcodes(new ArrayList<>(barcodes)).stream()
+            .map(stockEntityMapper::toStock)
+            .collect(Collectors.toSet());
+        StorageUnit toUpdateStorageUnit = storageUnitEntityMapper.toStorageUnit(currentStorageUnitEntityOptional.get())
+            .addProducts(stocks);
         StorageUnitEntity toUpdateStorageUnitEntity = storageUnitEntityMapper.toStorageUnitEntity(toUpdateStorageUnit);
         storageUnitRepository.persist(toUpdateStorageUnitEntity);
         return storageUnitEntityMapper.toStorageUnit(toUpdateStorageUnitEntity);
@@ -71,7 +75,7 @@ public class LogisticService implements LogisticAggregate {
 
     @Override
     @Transactional
-    public StorageUnit persist(StorageUnit storageUnit) {
+    public StorageUnit persistStorageUnit(StorageUnit storageUnit) {
         StorageUnitEntity storageUnitEntity = storageUnitEntityMapper.toStorageUnitEntity(storageUnit);
         storageUnitRepository.persist(storageUnitEntity);
         return storageUnitEntityMapper.toStorageUnit(storageUnitEntity);
@@ -85,7 +89,34 @@ public class LogisticService implements LogisticAggregate {
     }
 
     @Override
-    public Transfer transferProduct(String sourceUUID, String targetUUID, Map<String, Integer> productUUIDsWithQty) {
+    public Transfer transferProduct(String sourceUUID, String targetUUID, Set<String> barcodes) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    @Transactional
+    public Set<Stock> generateStocks(String storageUnitUUID, String productUUID, LocalDate expirationDate, Integer quantity) {
+        ProductEntity productEntity = productRepository.findByUuid(productUUID)
+            .orElseThrow(() -> new RuntimeException("Product with uuid " + productUUID + " not found"));
+        StorageUnitEntity storageUnitEntity = storageUnitRepository.findByUuid(storageUnitUUID)
+            .orElseThrow(() -> new RuntimeException("Storage Unit with uuid " + storageUnitUUID + " not found"));
+
+        StorageUnit storageUnit = storageUnitEntityMapper.toStorageUnit(storageUnitEntity);
+        Product product = productEntityMapper.toProduct(productEntity);
+        Set<Stock> stocks = new HashSet<>();
+        for (int i = 0; i < quantity; i++) {
+            Stock stock = storageUnit.generateStock(product, expirationDate);
+            stocks.add(stock);
+        }
+
+        Set<StockEntity> stockEntities = stocks.stream()
+            .map(stock -> stockEntityMapper.toStockEntity(stock))
+            .collect(Collectors.toSet());
+        stockEntities.forEach(stockEntity -> {
+            stockEntity.product = productEntity;
+            stockEntity.storageUnit = storageUnitEntity;
+        });
+        stockRepository.persist(stockEntities);
+        return stocks;
     }
 }

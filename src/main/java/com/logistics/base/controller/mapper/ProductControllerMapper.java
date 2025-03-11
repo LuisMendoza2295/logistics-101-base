@@ -20,14 +20,15 @@ public class ProductControllerMapper {
     }
 
     public Product toProduct(ProductDTO productDTO) {
-        return new Product(
-            productDTO.uuid(),
-            productDTO.name(),
-            new Dimensions(
+        return Product.builder()
+            .uuid(productDTO.uuid())
+            .name(productDTO.name())
+            .dimensions(new Dimensions(
                 productDTO.width(),
                 productDTO.height(),
-                productDTO.length()),
-            productDTO.netWeight(),
-            productDTO.grossWeight());
+                productDTO.length()))
+            .netWeight(productDTO.netWeight())
+            .grossWeight(productDTO.grossWeight())
+            .build();
     }
 }

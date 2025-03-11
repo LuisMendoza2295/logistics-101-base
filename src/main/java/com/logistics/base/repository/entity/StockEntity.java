@@ -2,6 +2,8 @@ package com.logistics.base.repository.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import java.time.LocalDate;
 
@@ -13,6 +15,11 @@ public class StockEntity extends PanacheEntity {
     public LocalDate expirationDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @Cascade(CascadeType.ALL)
     @JoinColumn(name = "product_id")
     public ProductEntity product;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Cascade(CascadeType.ALL)
+    public StorageUnitEntity storageUnit;
 }

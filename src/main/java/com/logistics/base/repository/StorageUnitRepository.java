@@ -4,10 +4,8 @@ import com.logistics.base.repository.entity.StorageUnitEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @ApplicationScoped
 public class StorageUnitRepository implements PanacheRepository<StorageUnitEntity> {

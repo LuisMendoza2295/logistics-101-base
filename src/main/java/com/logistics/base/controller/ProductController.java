@@ -16,7 +16,6 @@ public class ProductController {
 
     @Inject
     LogisticAggregate logisticAggregate;
-
     @Inject
     ProductControllerMapper productControllerMapper;
 
@@ -32,7 +31,7 @@ public class ProductController {
     @Produces(APPLICATION_JSON)
     @Consumes(APPLICATION_JSON)
     public Response createProduct(ProductDTO productDTO) {
-        Product product = logisticAggregate.persist(productControllerMapper.toProduct(productDTO));
+        Product product = logisticAggregate.persistProduct(productControllerMapper.toProduct(productDTO));
         return Response.status(CREATED).entity(productControllerMapper.toProductDTO(product)).build();
     }
 }

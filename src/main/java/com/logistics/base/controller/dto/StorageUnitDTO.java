@@ -14,6 +14,6 @@ public record StorageUnitDTO(
     BigDecimal weightOccupied,
     int maxUnits,
     String storageStatus,
-    Set<ProductDTO> products) {
+    Set<StockDTO> stocks) {
 
 }

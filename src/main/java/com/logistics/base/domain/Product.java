@@ -5,26 +5,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 public record Product(
+    Long id,
     UUID uuid,
     String name,
     Dimensions dimensions,
     BigDecimal netWeight,
     BigDecimal grossWeight) {
 
-  public Product(
-      String uuid,
-      String name,
-      Dimensions dimensions,
-      BigDecimal netWeight,
-      BigDecimal grossWeight) {
-    this(Optional.ofNullable(uuid).map(UUID::fromString).orElse(UUID.randomUUID()),
-        name,
-        dimensions,
-        netWeight,
-        grossWeight);
-  }
-
   public static final class Builder {
+    private Long id;
     private UUID uuid;
     private String name;
     private Dimensions dimensions;
@@ -32,6 +21,16 @@ public record Product(
     private BigDecimal grossWeight;
 
     private Builder() {
+    }
+
+    public Builder id(Long id) {
+      this.id = id;
+      return this;
+    }
+
+    public Builder uuid(String uuid) {
+      this.uuid = Optional.ofNullable(uuid).map(UUID::fromString).orElse(UUID.randomUUID());
+      return this;
     }
 
     public Builder uuid(UUID uuid) {
@@ -61,11 +60,27 @@ public record Product(
 
     public Product build() {
       return new Product(
+          id,
           uuid,
           name,
           dimensions,
           netWeight,
           grossWeight);
     }
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public Builder toBuilder() {
+    Builder builder = new Builder();
+    builder.id = id;
+    builder.uuid = this.uuid;
+    builder.name = this.name;
+    builder.dimensions = this.dimensions;
+    builder.netWeight = this.netWeight;
+    builder.grossWeight = this.grossWeight;
+    return builder;
   }
 }
