@@ -9,6 +9,8 @@ public interface LogisticAggregate {
 
     Product persistProduct(Product product);
 
+    StorageUnit findByStorageUnitUuid(String storageUnitUUID);
+
     StorageUnit persistStorageUnit(StorageUnit storageUnit);
 
     StorageUnit addProducts(String storageUnitUUID, Set<String> barcodes);
@@ -18,4 +20,6 @@ public interface LogisticAggregate {
     Transfer transferProduct(String sourceStorageUUID, String targetStorageUUID, Set<String> barcodes);
 
     Set<Stock> generateStocks(String storageUnitUUID, String productUUID, LocalDate expirationDate, Integer quantity);
+
+    Set<Stock> generateStocks(String productUUID, LocalDate expirationDate, Integer quantity);
 }

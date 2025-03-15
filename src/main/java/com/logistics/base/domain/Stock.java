@@ -64,4 +64,10 @@ public record Stock(
     public boolean isExpired() {
         return LocalDate.now().isAfter(expirationDate);
     }
+
+    public Stock setStorageUnit(StorageUnit storageUnit) {
+        return this.toBuilder()
+            .storageUnit(storageUnit)
+            .build();
+    }
 }

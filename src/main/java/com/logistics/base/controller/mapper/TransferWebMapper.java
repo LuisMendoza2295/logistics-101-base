@@ -1,6 +1,5 @@
 package com.logistics.base.controller.mapper;
 
-import com.logistics.base.controller.dto.CreateTransferDTO;
 import com.logistics.base.controller.dto.TransferDTO;
 import com.logistics.base.domain.Transfer;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -9,20 +8,20 @@ import jakarta.inject.Inject;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class TransferControllerMapper {
+public class TransferWebMapper {
 
     @Inject
-    StockControllerMapper stockControllerMapper;
+    StockWebMapper stockWebMapper;
     @Inject
-    StorageControllerMapper storageControllerMapper;
+    StorageWebMapper storageWebMapper;
 
     public TransferDTO toTransferDTO(Transfer transfer) {
         return new TransferDTO(
             transfer.uuid().toString(),
-            storageControllerMapper.toStorageUnitDTO(transfer.source()),
-            storageControllerMapper.toStorageUnitDTO(transfer.target()),
+            storageWebMapper.toStorageUnitDTO(transfer.source()),
+            storageWebMapper.toStorageUnitDTO(transfer.target()),
             transfer.stocks().stream()
-                .map(stock -> stockControllerMapper.toStockDTO(stock))
+                .map(stock -> stockWebMapper.toStockDTO(stock))
                 .collect(Collectors.toSet())
         );
     }
@@ -30,11 +29,11 @@ public class TransferControllerMapper {
     public Transfer toTransfer(TransferDTO transferDTO) {
         var builder = Transfer.builder()
             .uuid(transferDTO.uuid())
-            .source(storageControllerMapper.toStorageUnit(transferDTO.sourceStorageUnitDTO()))
-            .target(storageControllerMapper.toStorageUnit(transferDTO.targetStorageUnitDTO()))
+            .source(storageWebMapper.toStorageUnit(transferDTO.sourceStorageUnitDTO()))
+            .target(storageWebMapper.toStorageUnit(transferDTO.targetStorageUnitDTO()))
             .build();
         transferDTO.stockDTOs()
-            .forEach(stockDTO -> stockControllerMapper.toStock(stockDTO));
+            .forEach(stockDTO -> stockWebMapper.toStock(stockDTO));
         return builder;
     }
 }

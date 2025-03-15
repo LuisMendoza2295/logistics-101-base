@@ -1,7 +1,7 @@
 package com.logistics.base.controller;
 
 import com.logistics.base.controller.dto.CreateTransferDTO;
-import com.logistics.base.controller.mapper.TransferControllerMapper;
+import com.logistics.base.controller.mapper.TransferWebMapper;
 import com.logistics.base.domain.LogisticAggregate;
 import com.logistics.base.domain.Transfer;
 import jakarta.inject.Inject;
@@ -21,13 +21,13 @@ public class TransferController {
     LogisticAggregate logisticAggregate;
 
     @Inject
-    TransferControllerMapper transferControllerMapper;
+    TransferWebMapper transferWebMapper;
 
     @POST
     @Produces(APPLICATION_JSON)
     @Consumes(APPLICATION_JSON)
     public Response transferStock(CreateTransferDTO createTransferDTO) {
         Transfer transfer = logisticAggregate.transferProduct(createTransferDTO.sourceStorageUUID(), createTransferDTO.targetStorageUUID(), createTransferDTO.barcodes());
-        return Response.status(CREATED).entity(transferControllerMapper.toTransferDTO(transfer)).build();
+        return Response.status(CREATED).entity(transferWebMapper.toTransferDTO(transfer)).build();
     }
 }

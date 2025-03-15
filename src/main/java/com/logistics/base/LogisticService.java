@@ -4,13 +4,15 @@ import com.logistics.base.domain.*;
 import com.logistics.base.repository.ProductRepository;
 import com.logistics.base.repository.StockRepository;
 import com.logistics.base.repository.StorageUnitRepository;
+import com.logistics.base.repository.TransferRepository;
 import com.logistics.base.repository.entity.ProductEntity;
 import com.logistics.base.repository.entity.StockEntity;
 import com.logistics.base.repository.entity.StorageUnitEntity;
-import com.logistics.base.repository.mapper.ProductEntityMapper;
-import com.logistics.base.repository.mapper.StockEntityMapper;
-import com.logistics.base.repository.mapper.StorageUnitEntityMapper;
-import io.quarkus.logging.Log;
+import com.logistics.base.repository.entity.TransferEntity;
+import com.logistics.base.repository.mapper.ProductDbMapper;
+import com.logistics.base.repository.mapper.StockDbMapper;
+import com.logistics.base.repository.mapper.StorageUniDbMapper;
+import com.logistics.base.repository.mapper.TransferDbMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -18,6 +20,7 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @ApplicationScoped
 public class LogisticService implements LogisticAggregate {
@@ -28,18 +31,22 @@ public class LogisticService implements LogisticAggregate {
     StorageUnitRepository storageUnitRepository;
     @Inject
     StockRepository stockRepository;
+    @Inject
+    TransferRepository transferRepository;
 
     @Inject
-    ProductEntityMapper productEntityMapper;
+    ProductDbMapper productDbMapper;
     @Inject
-    StorageUnitEntityMapper storageUnitEntityMapper;
+    StorageUniDbMapper storageUniDbMapper;
     @Inject
-    StockEntityMapper stockEntityMapper;
+    StockDbMapper stockDbMapper;
+    @Inject
+    TransferDbMapper transferDbMapper;
 
     @Override
     public Product findByProductUuid(String uuid) {
         return productRepository.findByUuid(uuid)
-            .map(productEntity -> productEntityMapper.toProduct(productEntity))
+            .map(productEntity -> productDbMapper.toProduct(productEntity))
             .orElseThrow(() -> new RuntimeException("Product with uuid " + uuid + " not found"));
     }
 
@@ -49,83 +56,114 @@ public class LogisticService implements LogisticAggregate {
         if (productRepository.findByName(product.name()).isPresent()) {
             throw new RuntimeException("Product with name " + product.name() + " already exists");
         }
-        ProductEntity productEntity = productEntityMapper.toProductEntity(product);
+        ProductEntity productEntity = productDbMapper.toProductEntity(product);
         productRepository.persist(productEntity);
-        return productEntityMapper.toProduct(productEntity);
+        return productDbMapper.toProduct(productEntity);
     }
 
     @Override
     @Transactional
     public StorageUnit addProducts(String storageUnitUUID, Set<String> barcodes) {
-        Optional<StorageUnitEntity> currentStorageUnitEntityOptional = storageUnitRepository.findByUuid(storageUnitUUID);
-        if (currentStorageUnitEntityOptional.isEmpty()) {
-            throw new RuntimeException("Storage unit with uuid " + storageUnitUUID + " not found");
-        }
+        StorageUnit storageUnit = findByStorageUnitUuid(storageUnitUUID);
         Set<Stock> stocks = stockRepository.findByBarcodes(new ArrayList<>(barcodes)).stream()
-            .map(stockEntityMapper::toStock)
+            .map(stockDbMapper::toStock)
             .collect(Collectors.toSet());
-        StorageUnit toUpdateStorageUnit = storageUnitEntityMapper.toStorageUnit(currentStorageUnitEntityOptional.get())
-            .addProducts(stocks);
-        StorageUnitEntity toUpdateStorageUnitEntity = storageUnitEntityMapper.toStorageUnitEntity(toUpdateStorageUnit);
+        StorageUnit toUpdateStorageUnit = storageUnit.addProducts(stocks);
+        StorageUnitEntity toUpdateStorageUnitEntity = storageUniDbMapper.toStorageUnitEntity(toUpdateStorageUnit);
         storageUnitRepository.persist(toUpdateStorageUnitEntity);
-        return storageUnitEntityMapper.toStorageUnit(toUpdateStorageUnitEntity);
+        return storageUniDbMapper.toStorageUnit(toUpdateStorageUnitEntity);
+    }
+
+    @Override
+    public StorageUnit findByStorageUnitUuid(String storageUnitUUID) {
+        return storageUnitRepository.findByUuid(storageUnitUUID)
+            .map(storageUnitEntity -> storageUniDbMapper.toStorageUnit(storageUnitEntity))
+            .orElseThrow(() -> new RuntimeException("Storage Unit with uuid " + storageUnitUUID + " not found"));
     }
 
     @Override
     @Transactional
     public StorageUnit persistStorageUnit(StorageUnit storageUnit) {
-        StorageUnitEntity storageUnitEntity = storageUnitEntityMapper.toStorageUnitEntity(storageUnit);
+        StorageUnitEntity storageUnitEntity = storageUniDbMapper.toStorageUnitEntity(storageUnit);
         storageUnitRepository.persist(storageUnitEntity);
-        return storageUnitEntityMapper.toStorageUnit(storageUnitEntity);
+        return storageUniDbMapper.toStorageUnit(storageUnitEntity);
     }
 
     @Override
     public Set<StorageUnit> findByType(String storageType) {
         return storageUnitRepository.findByType(storageType).stream()
-            .map(storageUnitEntity -> storageUnitEntityMapper.toStorageUnit(storageUnitEntity))
+            .map(storageUnitEntity -> storageUniDbMapper.toStorageUnit(storageUnitEntity))
             .collect(Collectors.toSet());
     }
 
     @Override
+    @Transactional
     public Transfer transferProduct(String sourceStorageUUID, String targetStorageUUID, Set<String> barcodes) {
-        StorageUnitEntity sourceStorageUnitEntity = storageUnitRepository.findByUuid(sourceStorageUUID)
-            .orElseThrow(() -> new RuntimeException("Storage Unit with uuid " + sourceStorageUUID + " not found"));
-        StorageUnitEntity targetStorageUnitEntity = storageUnitRepository.findByUuid(targetStorageUUID)
-            .orElseThrow(() -> new RuntimeException("Storage Unit with uuid " + sourceStorageUUID + " not found"));
+        StorageUnit sourceStorageUnit = findByStorageUnitUuid(sourceStorageUUID);
+        StorageUnit targetStorageUnit = findByStorageUnitUuid(targetStorageUUID);
 
-        List<StockEntity> stockEntities = stockRepository.findByBarcodes(new ArrayList<>(barcodes));
+        Set<Stock> stocks = stockRepository.findByStorageUuidAndBarcodes(sourceStorageUUID, new ArrayList<>(barcodes))
+            .stream()
+            .map(stockEntity -> stockDbMapper.toStock(stockEntity))
+            .collect(Collectors.toSet());
+        Set<String> foundBarcodes = stocks.stream()
+            .map(Stock::barcode)
+            .collect(Collectors.toSet());
+        if (stocks.size() < barcodes.size()) {
+            Set<String> notFoundBarcodes = new HashSet<>(barcodes);
+            notFoundBarcodes.removeAll(foundBarcodes);
+            throw new RuntimeException("Stock entities with barcodes [" + notFoundBarcodes + "] do not exist in source storage unit");
+        }
 
-        StorageUnit sourceStorageUnit = storageUnitEntityMapper.toStorageUnit(sourceStorageUnitEntity);
-        StorageUnit targetStorageUnit = storageUnitEntityMapper.toStorageUnit(targetStorageUnitEntity);
-        return new Transfer(0L, UUID.randomUUID(), sourceStorageUnit, targetStorageUnit, new HashSet<>());
+        Set<Stock> toUpdateStocks = stocks.stream()
+            .map(stock -> stock.setStorageUnit(sourceStorageUnit))
+            .collect(Collectors.toSet());
+        stockRepository.persist(toUpdateStocks.stream()
+            .map(stock -> stockDbMapper.toStockEntity(stock))
+            .collect(Collectors.toSet()));
+
+        Transfer.Builder tranferBuilder = Transfer.builder()
+            .source(sourceStorageUnit)
+            .target(targetStorageUnit);
+        stocks.forEach(tranferBuilder::addStock);
+        TransferEntity transferEntity = transferDbMapper.toTransferEntity(tranferBuilder.build());
+        transferRepository.persist(transferEntity);
+
+        return transferDbMapper.toTransfer(transferEntity);
     }
 
     @Override
     @Transactional
     public Set<Stock> generateStocks(String storageUnitUUID, String productUUID, LocalDate expirationDate, Integer quantity) {
-        ProductEntity productEntity = productRepository.findByUuid(productUUID)
-            .orElseThrow(() -> new RuntimeException("Product with uuid " + productUUID + " not found"));
-        StorageUnitEntity storageUnitEntity = storageUnitRepository.findByUuid(storageUnitUUID)
-            .orElseThrow(() -> new RuntimeException("Storage Unit with uuid " + storageUnitUUID + " not found"));
+        StorageUnit storageUnit = findByStorageUnitUuid(storageUnitUUID);
+        Product product = findByProductUuid(productUUID);
 
-        StorageUnit storageUnit = storageUnitEntityMapper.toStorageUnit(storageUnitEntity);
-        Product product = productEntityMapper.toProduct(productEntity);
-        Set<Stock> stocks = new HashSet<>();
-        for (int i = 0; i < quantity; i++) {
-            Log.infof("iteration: %d of %d", i, quantity);
-            Stock stock = storageUnit.generateStock(product, expirationDate);
-            Log.infof("generated stock: %s", stock);
-            stocks.add(stock);
-        }
-
-        Set<StockEntity> stockEntities = stocks.stream()
-            .map(stock -> stockEntityMapper.toStockEntity(stock))
+        // Generate stocks for StorageUnit and Product
+        Set<StockEntity> stockEntities = IntStream.range(0, quantity)
+            .mapToObj(i -> storageUnit.generateStock(product, expirationDate))
+            .map(stock -> stockDbMapper.toStockEntity(stock))
             .collect(Collectors.toSet());
-        stockEntities.forEach(stockEntity -> {
-            stockEntity.product = productEntity;
-            stockEntity.storageUnit = storageUnitEntity;
-        });
+
         stockRepository.persist(stockEntities);
-        return stocks;
+        return stockEntities.stream()
+            .map(stockDbMapper::toStock)
+            .collect(Collectors.toSet());
+    }
+
+    @Override
+    @Transactional
+    public Set<Stock> generateStocks(String productUUID, LocalDate expirationDate, Integer quantity) {
+        Product product = findByProductUuid(productUUID);
+
+        // Generate stocks for Product
+        Set<StockEntity> stockEntities = IntStream.range(0, quantity)
+            .mapToObj(i -> product.generateStock(expirationDate))
+            .map(stock -> stockDbMapper.toStockEntity(stock))
+            .collect(Collectors.toSet());
+
+        stockRepository.persist(stockEntities);
+        return stockEntities.stream()
+            .map(stockDbMapper::toStock)
+            .collect(Collectors.toSet());
     }
 }

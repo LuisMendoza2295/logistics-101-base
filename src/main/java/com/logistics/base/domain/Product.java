@@ -1,6 +1,9 @@
 package com.logistics.base.domain;
 
+import uk.org.okapibarcode.backend.Code128;
+
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -75,5 +78,16 @@ public record Product(
     builder.netWeight = this.netWeight;
     builder.grossWeight = this.grossWeight;
     return builder;
+  }
+
+  public Stock generateStock(LocalDate expirationDate) {
+    Code128 barcode = new Code128();
+    barcode.setContent(UUID.randomUUID().toString());
+    return Stock.builder()
+        .barcode(barcode.getContent())
+        .expirationDate(expirationDate)
+        .product(this)
+        .storageUnit(null)
+        .build();
   }
 }

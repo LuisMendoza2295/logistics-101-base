@@ -5,28 +5,30 @@ import com.logistics.base.domain.Stock;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.util.Optional;
+
 @ApplicationScoped
-public class StockControllerMapper {
+public class StockWebMapper {
 
     @Inject
-    ProductControllerMapper productControllerMapper;
+    ProductWebMapper productWebMapper;
     @Inject
-    StorageControllerMapper storageControllerMapper;
+    StorageWebMapper storageWebMapper;
 
     public StockDTO toStockDTO(Stock stock) {
         return new StockDTO(
             stock.barcode(),
             stock.expirationDate(),
-            productControllerMapper.toProductDTO(stock.product()),
-            storageControllerMapper.toStorageUnitDTO(stock.storageUnit()));
+            productWebMapper.toProductDTO(stock.product()),
+            Optional.ofNullable(stock.storageUnit()).map(storageUnit -> storageWebMapper.toStorageUnitDTO(storageUnit)).orElse(null));
     }
 
     public Stock toStock(StockDTO stockDTO) {
         return Stock.builder()
             .barcode(stockDTO.barcode())
             .expirationDate(stockDTO.expirationDate())
-            .product(productControllerMapper.toProduct(stockDTO.product()))
-            .storageUnit(storageControllerMapper.toStorageUnit(stockDTO.storageUnit()))
+            .product(productWebMapper.toProduct(stockDTO.product()))
+            .storageUnit(storageWebMapper.toStorageUnit(stockDTO.storageUnit()))
             .build();
     }
 }

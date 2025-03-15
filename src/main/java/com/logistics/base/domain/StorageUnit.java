@@ -4,7 +4,6 @@ import uk.org.okapibarcode.backend.Code128;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.math.BigDecimal.ZERO;
@@ -168,5 +167,11 @@ public record StorageUnit(
         .product(product)
         .storageUnit(this)
         .build();
+  }
+
+  public Stock findByBarcode(String barcode) {
+    return this.stocks.stream()
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException("No stock found for barcode " + barcode));
   }
 }

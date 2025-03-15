@@ -6,7 +6,7 @@ import com.logistics.base.domain.Product;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class ProductControllerMapper {
+public class ProductWebMapper {
 
     public ProductDTO toProductDTO(Product product) {
         return new ProductDTO(

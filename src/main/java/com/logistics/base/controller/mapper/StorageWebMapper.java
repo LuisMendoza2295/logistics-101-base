@@ -9,10 +9,10 @@ import jakarta.inject.Inject;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class StorageControllerMapper {
+public class StorageWebMapper {
 
     @Inject
-    StockControllerMapper stockControllerMapper;
+    StockWebMapper stockWebMapper;
 
     public StorageUnitDTO toStorageUnitDTO(StorageUnit storageUnit) {
         return new StorageUnitDTO(
@@ -27,7 +27,7 @@ public class StorageControllerMapper {
             storageUnit.maxUnits(),
             storageUnit.storageStatus().name(),
             storageUnit.stocks().stream()
-                .map(stock -> stockControllerMapper.toStockDTO(stock))
+                .map(stock -> stockWebMapper.toStockDTO(stock))
                 .collect(Collectors.toSet())
         );
     }

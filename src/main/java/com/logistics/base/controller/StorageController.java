@@ -1,10 +1,10 @@
 package com.logistics.base.controller;
 
-import com.logistics.base.controller.dto.GenerateStockDTO;
+import com.logistics.base.controller.dto.GenerateStorageStockDTO;
 import com.logistics.base.controller.dto.StockDTO;
 import com.logistics.base.controller.dto.StorageUnitDTO;
-import com.logistics.base.controller.mapper.StockControllerMapper;
-import com.logistics.base.controller.mapper.StorageControllerMapper;
+import com.logistics.base.controller.mapper.StockWebMapper;
+import com.logistics.base.controller.mapper.StorageWebMapper;
 import com.logistics.base.domain.LogisticAggregate;
 import com.logistics.base.domain.StorageUnit;
 import jakarta.inject.Inject;
@@ -25,15 +25,15 @@ public class StorageController {
     LogisticAggregate logisticAggregate;
 
     @Inject
-    StorageControllerMapper storageControllerMapper;
+    StorageWebMapper storageWebMapper;
     @Inject
-    StockControllerMapper stockControllerMapper;
+    StockWebMapper stockWebMapper;
 
     @GET
     @Produces(APPLICATION_JSON)
     public Response getStorageUnits(@QueryParam("type") String type) {
         Set<StorageUnitDTO> storageUnitDTOs = logisticAggregate.findByType(type).stream()
-            .map(storageUnit -> storageControllerMapper.toStorageUnitDTO(storageUnit))
+            .map(storageUnit -> storageWebMapper.toStorageUnitDTO(storageUnit))
             .collect(Collectors.toSet());
         return Response.status(OK).entity(storageUnitDTOs).build();
     }
@@ -42,8 +42,8 @@ public class StorageController {
     @Produces(APPLICATION_JSON)
     @Consumes(APPLICATION_JSON)
     public Response createStorageUnit(StorageUnitDTO storageUnitDTO) {
-        StorageUnit storageUnit = logisticAggregate.persistStorageUnit(storageControllerMapper.toStorageUnit(storageUnitDTO));
-        return Response.status(CREATED).entity(storageControllerMapper.toStorageUnitDTO(storageUnit)).build();
+        StorageUnit storageUnit = logisticAggregate.persistStorageUnit(storageWebMapper.toStorageUnit(storageUnitDTO));
+        return Response.status(CREATED).entity(storageWebMapper.toStorageUnitDTO(storageUnit)).build();
     }
 
     @POST
@@ -52,21 +52,21 @@ public class StorageController {
     @Consumes(APPLICATION_JSON)
     public Response addProducts(String uuid, Set<String> barcodes) {
         StorageUnit storageUnit = logisticAggregate.addProducts(uuid, barcodes);
-        return Response.status(OK).entity(storageControllerMapper.toStorageUnitDTO(storageUnit)).build();
+        return Response.status(OK).entity(storageWebMapper.toStorageUnitDTO(storageUnit)).build();
     }
 
     @POST
     @Path("{uuid}/generate")
     @Produces(APPLICATION_JSON)
     @Consumes(APPLICATION_JSON)
-    public Response generateStock(String uuid, GenerateStockDTO generateStockDTO) {
+    public Response generateStock(String uuid, GenerateStorageStockDTO generateStorageStockDTO) {
         Set<StockDTO> stockDTOs = logisticAggregate.generateStocks(
                 uuid,
-                generateStockDTO.productUUID(),
-                generateStockDTO.expirationDate(),
-                generateStockDTO.quantity())
+                generateStorageStockDTO.productUUID(),
+                generateStorageStockDTO.expirationDate(),
+                generateStorageStockDTO.quantity())
             .stream()
-            .map(stockControllerMapper::toStockDTO).collect(Collectors.toSet());
+            .map(stockWebMapper::toStockDTO).collect(Collectors.toSet());
         return Response.status(CREATED).entity(stockDTOs).build();
     }
 }

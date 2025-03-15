@@ -1,23 +1,28 @@
 package com.logistics.base.repository.entity;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+@Entity(name = "transfers")
 @Table(name = "transfers")
-public class TransferEntity extends PanacheEntity {
+public class TransferEntity extends PanacheEntityBase {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @Column(unique = true)
-    public String uuid;
+    private String uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_storage_unit_id")
-    public StorageUnitEntity sourceStorage;
+    @JoinColumn(name = "source_storage_unit_id", nullable = true)
+    private StorageUnitEntity sourceStorage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_storage_unit_id")
-    public StorageUnitEntity targetStorage;
+    @JoinColumn(name = "target_storage_unit_id", nullable = true)
+    private StorageUnitEntity targetStorage;
 
     @ManyToMany
     @JoinTable(
@@ -25,5 +30,62 @@ public class TransferEntity extends PanacheEntity {
         joinColumns = {@JoinColumn(name = "transfer_id")},
         inverseJoinColumns = {@JoinColumn(name = "stock_id")}
     )
-    public Set<StockEntity> stocks;
+    private Set<StockEntity> stocks = new HashSet<>();
+
+    public Long id() {
+        return id;
+    }
+
+    public TransferEntity setId(Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public String uuid() {
+        return uuid;
+    }
+
+    public TransferEntity setUuid(String uuid) {
+        this.uuid = uuid;
+        return this;
+    }
+
+    public StorageUnitEntity sourceStorage() {
+        return sourceStorage;
+    }
+
+    public TransferEntity setSourceStorage(StorageUnitEntity sourceStorage) {
+        this.sourceStorage = sourceStorage;
+        return this;
+    }
+
+    public StorageUnitEntity targetStorage() {
+        return targetStorage;
+    }
+
+    public TransferEntity setTargetStorage(StorageUnitEntity targetStorage) {
+        this.targetStorage = targetStorage;
+        return this;
+    }
+
+    public Set<StockEntity> stocks() {
+        return stocks;
+    }
+
+    public TransferEntity setStocks(Set<StockEntity> stocks) {
+        this.stocks = stocks;
+        return this;
+    }
+
+    public TransferEntity addStock(StockEntity stockEntity) {
+        stocks.add(stockEntity);
+        return this;
+    }
+
+    public TransferEntity getAttachedEntity() {
+        if (this.id == null) {
+            return this;
+        }
+        return getEntityManager().merge(this);
+    }
 }
