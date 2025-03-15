@@ -32,69 +32,56 @@ public record StorageUnit(
     private int maxUnits;
     private StorageStatus storageStatus;
     private final Set<Stock> stocks = new HashSet<>();
-
     private Builder() {}
 
     public Builder id(Long id) {
       this.id = id;
       return this;
     }
-
     public Builder uuid(String uuid) {
       this.uuid = Optional.ofNullable(uuid).map(UUID::fromString).orElse(UUID.randomUUID());
       return this;
     }
-
     public Builder uuid(UUID uuid) {
       this.uuid = uuid;
       return this;
     }
-
     public Builder storageType(String storageType) {
       this.storageType = StorageType.valueOf(storageType);
       return this;
     }
-
     public Builder storageType(StorageType storageType) {
       this.storageType = storageType;
       return this;
     }
-
     public Builder dimensions(Dimensions dimensions) {
       this.dimensions = dimensions;
       return this;
     }
-
     public Builder weightCapacity(BigDecimal weightCapacity) {
       this.weightCapacity = weightCapacity;
       return this;
     }
-
     public Builder volumeOccupied(BigDecimal volumeOccupied) {
       this.volumeOccupied = volumeOccupied;
       return this;
     }
-
     public Builder weightOccupied(BigDecimal weightOccupied) {
       this.weightOccupied = weightOccupied;
       return this;
     }
-
     public Builder maxUnits(int maxUnits) {
       this.maxUnits = maxUnits;
       return this;
     }
-
     public Builder storageStatus(String storageStatus) {
       this.storageStatus = StorageStatus.valueOf(storageStatus);
       return this;
     }
-
     public Builder storageStatus(StorageStatus storageStatus) {
       this.storageStatus = storageStatus;
       return this;
     }
-
     public Builder addStock(Stock stock) {
       this.stocks.add(stock);
       return this;
@@ -173,9 +160,8 @@ public record StorageUnit(
   }
 
   public Stock generateStock(Product product, LocalDate expirationDate) {
-    LocalDateTime now = LocalDateTime.now();
     Code128 barcode = new Code128();
-    barcode.setContent(String.valueOf(now.getNano()));
+    barcode.setContent(UUID.randomUUID().toString());
     return Stock.builder()
         .barcode(barcode.getContent())
         .expirationDate(expirationDate)

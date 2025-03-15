@@ -7,7 +7,7 @@ import org.hibernate.annotations.CascadeType;
 
 import java.time.LocalDate;
 
-@Entity
+@Entity(name = "stocks")
 @Table(name = "stocks")
 public class StockEntity extends PanacheEntity {
     @Column(unique = true)
@@ -21,5 +21,6 @@ public class StockEntity extends PanacheEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @Cascade(CascadeType.ALL)
+    @JoinColumn(name = "storage_unit_id")
     public StorageUnitEntity storageUnit;
 }

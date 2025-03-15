@@ -3,7 +3,6 @@ package com.logistics.base.controller;
 import com.logistics.base.controller.dto.GenerateStockDTO;
 import com.logistics.base.controller.dto.StockDTO;
 import com.logistics.base.controller.dto.StorageUnitDTO;
-import com.logistics.base.controller.mapper.ProductControllerMapper;
 import com.logistics.base.controller.mapper.StockControllerMapper;
 import com.logistics.base.controller.mapper.StorageControllerMapper;
 import com.logistics.base.domain.LogisticAggregate;
@@ -27,8 +26,6 @@ public class StorageController {
 
     @Inject
     StorageControllerMapper storageControllerMapper;
-    @Inject
-    ProductControllerMapper productControllerMapper;
     @Inject
     StockControllerMapper stockControllerMapper;
 

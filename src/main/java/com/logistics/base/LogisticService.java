@@ -10,15 +10,13 @@ import com.logistics.base.repository.entity.StorageUnitEntity;
 import com.logistics.base.repository.mapper.ProductEntityMapper;
 import com.logistics.base.repository.mapper.StockEntityMapper;
 import com.logistics.base.repository.mapper.StorageUnitEntityMapper;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -89,8 +87,17 @@ public class LogisticService implements LogisticAggregate {
     }
 
     @Override
-    public Transfer transferProduct(String sourceUUID, String targetUUID, Set<String> barcodes) {
-        throw new UnsupportedOperationException();
+    public Transfer transferProduct(String sourceStorageUUID, String targetStorageUUID, Set<String> barcodes) {
+        StorageUnitEntity sourceStorageUnitEntity = storageUnitRepository.findByUuid(sourceStorageUUID)
+            .orElseThrow(() -> new RuntimeException("Storage Unit with uuid " + sourceStorageUUID + " not found"));
+        StorageUnitEntity targetStorageUnitEntity = storageUnitRepository.findByUuid(targetStorageUUID)
+            .orElseThrow(() -> new RuntimeException("Storage Unit with uuid " + sourceStorageUUID + " not found"));
+
+        List<StockEntity> stockEntities = stockRepository.findByBarcodes(new ArrayList<>(barcodes));
+
+        StorageUnit sourceStorageUnit = storageUnitEntityMapper.toStorageUnit(sourceStorageUnitEntity);
+        StorageUnit targetStorageUnit = storageUnitEntityMapper.toStorageUnit(targetStorageUnitEntity);
+        return new Transfer(0L, UUID.randomUUID(), sourceStorageUnit, targetStorageUnit, new HashSet<>());
     }
 
     @Override
@@ -105,7 +112,9 @@ public class LogisticService implements LogisticAggregate {
         Product product = productEntityMapper.toProduct(productEntity);
         Set<Stock> stocks = new HashSet<>();
         for (int i = 0; i < quantity; i++) {
+            Log.infof("iteration: %d of %d", i, quantity);
             Stock stock = storageUnit.generateStock(product, expirationDate);
+            Log.infof("generated stock: %s", stock);
             stocks.add(stock);
         }
 

@@ -15,7 +15,7 @@ public interface LogisticAggregate {
 
     Set<StorageUnit> findByType(String storageType);
 
-    Transfer transferProduct(String sourceUUID, String targetUUID, Set<String> barcodes);
+    Transfer transferProduct(String sourceStorageUUID, String targetStorageUUID, Set<String> barcodes);
 
     Set<Stock> generateStocks(String storageUnitUUID, String productUUID, LocalDate expirationDate, Integer quantity);
 }

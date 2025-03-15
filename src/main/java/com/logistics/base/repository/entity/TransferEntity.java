@@ -12,9 +12,11 @@ public class TransferEntity extends PanacheEntity {
     public String uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "source_storage_unit_id")
     public StorageUnitEntity sourceStorage;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "target_storage_unit_id")
     public StorageUnitEntity targetStorage;
 
     @ManyToMany
@@ -24,13 +26,4 @@ public class TransferEntity extends PanacheEntity {
         inverseJoinColumns = {@JoinColumn(name = "stock_id")}
     )
     public Set<StockEntity> stocks;
-
-//    @ElementCollection
-//    @JoinTable(
-//        name = "transfer_products",
-//        joinColumns = {@JoinColumn(name = "transfer_id")}
-//    )
-//    @MapKeyJoinColumn(name = "product_id")
-//    @Column(name = "quantity")
-//    public Map<ProductEntity, Integer> productsWithQty;
 }

@@ -20,4 +20,13 @@ public class StockControllerMapper {
             productControllerMapper.toProductDTO(stock.product()),
             storageControllerMapper.toStorageUnitDTO(stock.storageUnit()));
     }
+
+    public Stock toStock(StockDTO stockDTO) {
+        return Stock.builder()
+            .barcode(stockDTO.barcode())
+            .expirationDate(stockDTO.expirationDate())
+            .product(productControllerMapper.toProduct(stockDTO.product()))
+            .storageUnit(storageControllerMapper.toStorageUnit(stockDTO.storageUnit()))
+            .build();
+    }
 }

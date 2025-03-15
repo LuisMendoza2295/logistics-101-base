@@ -19,7 +19,6 @@ public record Product(
     private Dimensions dimensions;
     private BigDecimal netWeight;
     private BigDecimal grossWeight;
-
     private Builder() {
     }
 
@@ -27,32 +26,26 @@ public record Product(
       this.id = id;
       return this;
     }
-
     public Builder uuid(String uuid) {
       this.uuid = Optional.ofNullable(uuid).map(UUID::fromString).orElse(UUID.randomUUID());
       return this;
     }
-
     public Builder uuid(UUID uuid) {
       this.uuid = uuid;
       return this;
     }
-
     public Builder name(String name) {
       this.name = name;
       return this;
     }
-
     public Builder dimensions(Dimensions dimensions) {
       this.dimensions = dimensions;
       return this;
     }
-
     public Builder netWeight(BigDecimal netWeight) {
       this.netWeight = netWeight;
       return this;
     }
-
     public Builder grossWeight(BigDecimal grossWeight) {
       this.grossWeight = grossWeight;
       return this;
