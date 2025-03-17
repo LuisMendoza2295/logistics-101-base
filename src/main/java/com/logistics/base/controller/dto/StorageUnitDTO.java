@@ -1,7 +1,10 @@
 package com.logistics.base.controller.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.logistics.base.controller.mapper.ProductWebMapper;
+
 import java.math.BigDecimal;
-import java.util.Set;
+import java.util.Map;
 
 public record StorageUnitDTO(
     String uuid,
@@ -14,6 +17,7 @@ public record StorageUnitDTO(
     BigDecimal weightOccupied,
     int maxUnits,
     String storageStatus,
-    Set<StockDTO> stocks) {
+    @JsonDeserialize(keyUsing = ProductWebMapper.class)
+    Map<ProductDTO, Integer> productsWithQty) {
 
 }

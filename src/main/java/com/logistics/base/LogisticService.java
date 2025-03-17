@@ -71,7 +71,13 @@ public class LogisticService implements LogisticAggregate {
         StorageUnit toUpdateStorageUnit = storageUnit.addProducts(stocks);
         StorageUnitEntity toUpdateStorageUnitEntity = storageUniDbMapper.toStorageUnitEntity(toUpdateStorageUnit);
         storageUnitRepository.persist(toUpdateStorageUnitEntity);
-        return storageUniDbMapper.toStorageUnit(toUpdateStorageUnitEntity);
+
+        Set<StockEntity> stockEntities = stocks.stream()
+            .map(stock -> stock.setStorageUnit(toUpdateStorageUnit))
+            .map(stockDbMapper::toStockEntity)
+            .collect(Collectors.toSet());
+        stockRepository.persist(stockEntities);
+        return toUpdateStorageUnit;
     }
 
     @Override
@@ -91,7 +97,7 @@ public class LogisticService implements LogisticAggregate {
 
     @Override
     public Set<StorageUnit> findByType(String storageType) {
-        return storageUnitRepository.findByType(storageType).stream()
+        return storageUnitRepository.findWithProductsQtyByType(storageType).stream()
             .map(storageUnitEntity -> storageUniDbMapper.toStorageUnit(storageUnitEntity))
             .collect(Collectors.toSet());
     }
@@ -122,7 +128,7 @@ public class LogisticService implements LogisticAggregate {
             .map(stock -> stockDbMapper.toStockEntity(stock))
             .collect(Collectors.toSet()));
 
-        Transfer.Builder tranferBuilder = Transfer.builder()
+        var tranferBuilder = Transfer.builder()
             .source(sourceStorageUnit)
             .target(targetStorageUnit);
         stocks.forEach(tranferBuilder::addStock);

@@ -10,7 +10,7 @@ import jakarta.inject.Inject;
 public class StorageUniDbMapper {
 
     @Inject
-    StockDbMapper stockDbMapper;
+    ProductDbMapper productDbMapper;
 
     public StorageUnitEntity toStorageUnitEntity(StorageUnit storageUnit) {
         StorageUnitEntity storageUnitEntity = new StorageUnitEntity();
@@ -25,15 +25,15 @@ public class StorageUniDbMapper {
         storageUnitEntity.setVolumeOccupied(storageUnit.volumeOccupied());
         storageUnitEntity.setWeightOccupied(storageUnit.weightOccupied());
         storageUnitEntity.setMaxUnits(storageUnit.maxUnits());
-        // Avoid infinite reference loop and stackoverflow exception
-        storageUnit.stocks().stream()
-            .map(stock -> stockDbMapper.toStockEntity(stock, storageUnitEntity))
-            .forEach(storageUnitEntity::addStock);
+        storageUnit.productsWithQty()
+            .forEach(
+                (product, qty) -> storageUnitEntity.addProductWithQty(productDbMapper.toProductEntity(product), qty)
+            );
         return storageUnitEntity.getAttachedEntity();
     }
 
     public StorageUnit toStorageUnit(StorageUnitEntity storageUnitEntity) {
-        StorageUnit storageUnit = StorageUnit.builder()
+        var builder = StorageUnit.builder()
             .id(storageUnitEntity.id())
             .uuid(storageUnitEntity.uuid())
             .storageType(storageUnitEntity.storageType())
@@ -46,13 +46,11 @@ public class StorageUniDbMapper {
             .volumeOccupied(storageUnitEntity.volumeOccupied())
             .weightOccupied(storageUnitEntity.weightOccupied())
             .maxUnits(storageUnitEntity.maxUnits())
-            .storageStatus(storageUnitEntity.storageStatus())
-            .build();
-        StorageUnit.Builder builder = storageUnit.toBuilder();
-        // Avoid infinite reference loop and stackoverflow exception
-        storageUnitEntity.stocks().stream()
-            .map(stockEntity -> stockDbMapper.toStock(stockEntity, storageUnit))
-            .forEach(builder::addStock);
+            .storageStatus(storageUnitEntity.storageStatus());
+        storageUnitEntity.productsWithQty()
+            .forEach(
+                (productEntity, qty) -> builder.addProduct(productDbMapper.toProduct(productEntity), qty)
+            );
         return builder.build();
     }
 }

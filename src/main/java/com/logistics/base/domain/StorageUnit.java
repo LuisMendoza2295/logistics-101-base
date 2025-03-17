@@ -18,7 +18,7 @@ public record StorageUnit(
     BigDecimal weightOccupied,
     int maxUnits,
     StorageStatus storageStatus,
-    Set<Stock> stocks) {
+    Map<Product, Integer> productsWithQty) {
 
   public static final class Builder {
     private Long id;
@@ -30,7 +30,7 @@ public record StorageUnit(
     private BigDecimal weightOccupied;
     private int maxUnits;
     private StorageStatus storageStatus;
-    private final Set<Stock> stocks = new HashSet<>();
+    private final Map<Product, Integer> productsWithQty = new HashMap<>();
     private Builder() {}
 
     public Builder id(Long id) {
@@ -82,7 +82,19 @@ public record StorageUnit(
       return this;
     }
     public Builder addStock(Stock stock) {
-      this.stocks.add(stock);
+      this.addProduct(stock.product());
+      return this;
+    }
+    public Builder addProduct(Product product) {
+      this.addProduct(product, 1);
+      return this;
+    }
+    public Builder addProduct(Product product, int quantity) {
+      if (productsWithQty.containsKey(product)) {
+        productsWithQty.put(product, productsWithQty.get(product) + quantity);
+      } else {
+        productsWithQty.put(product, quantity);
+      }
       return this;
     }
 
@@ -97,7 +109,7 @@ public record StorageUnit(
           weightOccupied,
           maxUnits,
           storageStatus,
-          stocks
+          productsWithQty
       );
     }
   }
@@ -113,7 +125,7 @@ public record StorageUnit(
         .weightOccupied(weightOccupied)
         .maxUnits(maxUnits)
         .storageStatus(storageStatus);
-    stocks.forEach(builder::addStock);
+    productsWithQty.forEach(builder::addProduct);
     return builder;
   }
 
@@ -130,30 +142,36 @@ public record StorageUnit(
   }
 
   public BigDecimal calculateOccupiedSpace() {
-    return stocks.stream()
-        .map(stock -> stock.product().dimensions().getVolume())
+    return productsWithQty.entrySet().stream()
+        .map(productEntry ->
+            productEntry.getKey().dimensions().getVolume()
+                .multiply(BigDecimal.valueOf(productEntry.getValue())))
         .reduce(ZERO, BigDecimal::add);
   }
 
   public StorageUnit addProduct(Stock stock) {
-    BigDecimal availableSpace = dimensions.getVolume().subtract(calculateOccupiedSpace());
-    BigDecimal productVolume = stock.product().dimensions().getVolume();
-    if (availableSpace.compareTo(productVolume) < 0) {
-      throw new RuntimeException("No space available for product " + stock.product().name());
-    }
-    BigDecimal productWeight = stock.product().grossWeight();
-    if (availableWeight().compareTo(productWeight) < 0) {
-      throw new RuntimeException("Weight support is not available for product " + stock.product().name());
-    }
-    return this.toBuilder()
-        .addStock(stock)
-        .volumeOccupied(volumeOccupied.add(productVolume))
-        .weightOccupied(weightOccupied.add(productWeight))
-        .build();
+    return addProducts(Set.of(stock));
   }
 
   public StorageUnit addProducts(Set<Stock> stocks) {
-    Builder builder = this.toBuilder();
+    BigDecimal totalVolume = dimensions.getVolume();
+    BigDecimal availableSpace = totalVolume.subtract(calculateOccupiedSpace());
+    BigDecimal availableWeight = availableWeight();
+    for (Stock stock : stocks) {
+      BigDecimal productVolume = stock.product().dimensions().getVolume();
+      if (availableSpace.compareTo(productVolume) < 0) {
+        throw new RuntimeException("No space available for product " + stock.product().name());
+      }
+      BigDecimal productWeight = stock.product().grossWeight();
+      if (availableWeight.compareTo(productWeight) < 0) {
+        throw new RuntimeException("Weight support is not available for product " + stock.product().name());
+      }
+      availableSpace = availableSpace.subtract(productVolume);
+      availableWeight = availableWeight.subtract(productWeight);
+    }
+    var builder = this.toBuilder()
+        .volumeOccupied(totalVolume.subtract(availableSpace))
+        .weightOccupied(weightCapacity.subtract(availableWeight));
     stocks.forEach(builder::addStock);
     return builder.build();
   }
@@ -167,11 +185,5 @@ public record StorageUnit(
         .product(product)
         .storageUnit(this)
         .build();
-  }
-
-  public Stock findByBarcode(String barcode) {
-    return this.stocks.stream()
-        .findFirst()
-        .orElseThrow(() -> new RuntimeException("No stock found for barcode " + barcode));
   }
 }

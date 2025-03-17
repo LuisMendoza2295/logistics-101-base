@@ -4,8 +4,8 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity(name = "storageUnits")
 @Table(
@@ -30,9 +30,8 @@ public class StorageUnitEntity extends PanacheEntityBase {
     private BigDecimal volumeOccupied;
     private BigDecimal weightOccupied;
     private Integer maxUnits;
-
-    @OneToMany(mappedBy = "storageUnit", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<StockEntity> stocks = new HashSet<>();
+    @Transient
+    private Map<ProductEntity, Integer> productsWithQty = new HashMap<>();
 
     public Long id() {
         return id;
@@ -133,18 +132,17 @@ public class StorageUnitEntity extends PanacheEntityBase {
         return this;
     }
 
-    public Set<StockEntity> stocks() {
-        return stocks;
+    public Map<ProductEntity, Integer> productsWithQty() {
+        return productsWithQty;
     }
 
-    public StorageUnitEntity setStocks(Set<StockEntity> stocks) {
-        this.stocks = stocks;
+    public StorageUnitEntity setProductsWithQty(Map<ProductEntity, Integer> productsWithQty) {
+        this.productsWithQty = productsWithQty;
         return this;
     }
 
-    public StorageUnitEntity addStock(StockEntity stockEntity) {
-        stockEntity.setStorageUnit(this);
-        stocks.add(stockEntity);
+    public StorageUnitEntity addProductWithQty(ProductEntity product, int quantity) {
+        this.productsWithQty.put(product, quantity);
         return this;
     }
 

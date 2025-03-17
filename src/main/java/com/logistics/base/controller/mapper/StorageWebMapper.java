@@ -6,13 +6,14 @@ import com.logistics.base.domain.StorageUnit;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class StorageWebMapper {
 
     @Inject
-    StockWebMapper stockWebMapper;
+    ProductWebMapper productWebMapper;
 
     public StorageUnitDTO toStorageUnitDTO(StorageUnit storageUnit) {
         return new StorageUnitDTO(
@@ -26,14 +27,16 @@ public class StorageWebMapper {
             storageUnit.weightOccupied(),
             storageUnit.maxUnits(),
             storageUnit.storageStatus().name(),
-            storageUnit.stocks().stream()
-                .map(stock -> stockWebMapper.toStockDTO(stock))
-                .collect(Collectors.toSet())
+            storageUnit.productsWithQty().entrySet().stream()
+                .collect(Collectors.toMap(
+                    entry -> productWebMapper.toProductDTO(entry.getKey()),
+                    Map.Entry::getValue
+                ))
         );
     }
 
     public StorageUnit toStorageUnit(StorageUnitDTO storageUnitDTO) {
-        return StorageUnit.builder()
+        var builder = StorageUnit.builder()
             .uuid(storageUnitDTO.uuid())
             .storageType(storageUnitDTO.storageType())
             .dimensions(new Dimensions(
@@ -44,7 +47,11 @@ public class StorageWebMapper {
             .volumeOccupied(storageUnitDTO.volumeOccupied())
             .weightOccupied(storageUnitDTO.weightOccupied())
             .maxUnits(storageUnitDTO.maxUnits())
-            .storageStatus(storageUnitDTO.storageStatus())
-            .build();
+            .storageStatus(storageUnitDTO.storageStatus());
+        storageUnitDTO.productsWithQty()
+            .forEach(
+                (productDTO, qty) -> builder.addProduct(productWebMapper.toProduct(productDTO), qty)
+            );
+        return builder.build();
     }
 }

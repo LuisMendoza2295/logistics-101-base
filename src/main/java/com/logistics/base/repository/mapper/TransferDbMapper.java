@@ -26,7 +26,7 @@ public class TransferDbMapper {
     }
 
     public Transfer toTransfer(TransferEntity transferEntity) {
-        Transfer.Builder transferBuilder = Transfer.builder()
+        var transferBuilder = Transfer.builder()
             .id(transferEntity.id())
             .uuid(transferEntity.uuid())
             .source(storageUniDbMapper.toStorageUnit(transferEntity.sourceStorage()))

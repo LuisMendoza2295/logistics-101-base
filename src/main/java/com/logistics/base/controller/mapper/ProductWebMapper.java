@@ -1,12 +1,21 @@
 package com.logistics.base.controller.mapper;
 
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.KeyDeserializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.logistics.base.controller.dto.ProductDTO;
 import com.logistics.base.domain.Dimensions;
 import com.logistics.base.domain.Product;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import java.io.IOException;
 
 @ApplicationScoped
-public class ProductWebMapper {
+public class ProductWebMapper extends KeyDeserializer {
+
+    @Inject
+    ObjectMapper objectMapper;
 
     public ProductDTO toProductDTO(Product product) {
         return new ProductDTO(
@@ -30,5 +39,10 @@ public class ProductWebMapper {
             .netWeight(productDTO.netWeight())
             .grossWeight(productDTO.grossWeight())
             .build();
+    }
+
+    @Override
+    public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+        return objectMapper.readValue(key, ProductDTO.class);
     }
 }
