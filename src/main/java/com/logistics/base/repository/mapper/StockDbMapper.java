@@ -15,15 +15,17 @@ public class StockDbMapper {
     StorageUniDbMapper storageUniDbMapper;
 
     public StockEntity toStockEntity(Stock stock) {
-        StockEntity stockEntity = new StockEntity();
-        stockEntity.setId(stock.id());
+        StockEntity temp = new StockEntity();
+        temp.setId(stock.id());
+
+        StockEntity stockEntity = temp.getAttachedEntity();
         stockEntity.setBarcode(stock.barcode());
         stockEntity.setExpirationDate(stock.expirationDate());
         stockEntity.setProduct(productDbMapper.toProductEntity(stock.product()));
         if (stock.storageUnit() != null) {
             stockEntity.setStorageUnit(storageUniDbMapper.toStorageUnitEntity(stock.storageUnit()));
         }
-        return stockEntity.getAttachedEntity();
+        return stockEntity;
     }
 
     public Stock toStock(StockEntity stockEntity) {

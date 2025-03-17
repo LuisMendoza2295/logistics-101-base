@@ -17,11 +17,11 @@ public class TransferEntity extends PanacheEntityBase {
     private String uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_storage_unit_id", nullable = true)
+    @JoinColumn(name = "source_storage_unit_id", nullable = false)
     private StorageUnitEntity sourceStorage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_storage_unit_id", nullable = true)
+    @JoinColumn(name = "target_storage_unit_id", nullable = false)
     private StorageUnitEntity targetStorage;
 
     @ManyToMany

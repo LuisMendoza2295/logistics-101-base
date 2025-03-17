@@ -6,6 +6,8 @@ import com.logistics.base.repository.entity.StorageUnitEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.util.HashMap;
+
 @ApplicationScoped
 public class StorageUniDbMapper {
 
@@ -13,8 +15,10 @@ public class StorageUniDbMapper {
     ProductDbMapper productDbMapper;
 
     public StorageUnitEntity toStorageUnitEntity(StorageUnit storageUnit) {
-        StorageUnitEntity storageUnitEntity = new StorageUnitEntity();
-        storageUnitEntity.setId(storageUnit.id());
+        StorageUnitEntity temp = new StorageUnitEntity();
+        temp.setId(storageUnit.id());
+
+        StorageUnitEntity storageUnitEntity = temp.getAttachedEntity();
         storageUnitEntity.setUuid(storageUnit.uuid().toString());
         storageUnitEntity.setStorageType(storageUnit.storageType().name());
         storageUnitEntity.setStorageStatus(storageUnit.storageStatus().name());
@@ -25,6 +29,7 @@ public class StorageUniDbMapper {
         storageUnitEntity.setVolumeOccupied(storageUnit.volumeOccupied());
         storageUnitEntity.setWeightOccupied(storageUnit.weightOccupied());
         storageUnitEntity.setMaxUnits(storageUnit.maxUnits());
+        storageUnitEntity.setProductsWithQty(new HashMap<>());
         storageUnit.productsWithQty()
             .forEach(
                 (product, qty) -> storageUnitEntity.addProductWithQty(productDbMapper.toProductEntity(product), qty)

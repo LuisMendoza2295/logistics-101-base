@@ -68,7 +68,7 @@ public class LogisticService implements LogisticAggregate {
         Set<Stock> stocks = stockRepository.findByBarcodes(new ArrayList<>(barcodes)).stream()
             .map(stockDbMapper::toStock)
             .collect(Collectors.toSet());
-        StorageUnit toUpdateStorageUnit = storageUnit.addProducts(stocks);
+        StorageUnit toUpdateStorageUnit = storageUnit.addStocks(stocks);
         StorageUnitEntity toUpdateStorageUnitEntity = storageUniDbMapper.toStorageUnitEntity(toUpdateStorageUnit);
         storageUnitRepository.persist(toUpdateStorageUnitEntity);
 
@@ -121,18 +121,22 @@ public class LogisticService implements LogisticAggregate {
             throw new RuntimeException("Stock entities with barcodes [" + notFoundBarcodes + "] do not exist in source storage unit");
         }
 
+        StorageUnit toUpdateSourceStorageUnit = sourceStorageUnit.removeStocks(stocks);
+        StorageUnit toUpdateTargetStorageUnit = targetStorageUnit.addStocks(stocks);
+
         Set<Stock> toUpdateStocks = stocks.stream()
-            .map(stock -> stock.setStorageUnit(sourceStorageUnit))
+            .map(stock -> stock.setStorageUnit(toUpdateTargetStorageUnit))
             .collect(Collectors.toSet());
         stockRepository.persist(toUpdateStocks.stream()
             .map(stock -> stockDbMapper.toStockEntity(stock))
             .collect(Collectors.toSet()));
 
         var tranferBuilder = Transfer.builder()
-            .source(sourceStorageUnit)
-            .target(targetStorageUnit);
-        stocks.forEach(tranferBuilder::addStock);
-        TransferEntity transferEntity = transferDbMapper.toTransferEntity(tranferBuilder.build());
+            .source(toUpdateSourceStorageUnit)
+            .target(toUpdateTargetStorageUnit);
+        toUpdateStocks.forEach(tranferBuilder::addStock);
+        Transfer transfer = tranferBuilder.build();
+        TransferEntity transferEntity = transferDbMapper.toTransferEntity(transfer);
         transferRepository.persist(transferEntity);
 
         return transferDbMapper.toTransfer(transferEntity);

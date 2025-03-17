@@ -14,15 +14,17 @@ public class TransferDbMapper {
     StockDbMapper stockDbMapper;
 
     public TransferEntity toTransferEntity(Transfer transfer) {
-        TransferEntity transferEntity = new TransferEntity();
-        transferEntity.setId(transfer.id());
+        TransferEntity temp = new TransferEntity();
+        temp.setId(transfer.id());
+
+        TransferEntity transferEntity = temp.getAttachedEntity();
         transferEntity.setUuid(transfer.uuid().toString());
         transferEntity.setSourceStorage(storageUniDbMapper.toStorageUnitEntity(transfer.source()));
-        transferEntity.setTargetStorage(storageUniDbMapper.toStorageUnitEntity(transfer.source()));
+        transferEntity.setTargetStorage(storageUniDbMapper.toStorageUnitEntity(transfer.target()));
         transfer.stocks().stream()
             .map(stock -> stockDbMapper.toStockEntity(stock))
             .forEach(transferEntity::addStock);
-        return transferEntity.getAttachedEntity();
+        return transferEntity;
     }
 
     public Transfer toTransfer(TransferEntity transferEntity) {

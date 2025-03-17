@@ -18,7 +18,7 @@ public class StorageUnitRepository implements PanacheRepository<StorageUnitEntit
             "GROUP BY su, p", Object[].class);
         query.setParameter("uuid", uuid);
 
-        return parseRow(query.getSingleResult());
+        return parseRows(query.getResultList()).stream().findFirst();
     }
 
     public Set<StorageUnitEntity> findWithProductsQtyByType(String storageType) {

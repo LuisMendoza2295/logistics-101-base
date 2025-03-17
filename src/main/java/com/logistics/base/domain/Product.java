@@ -57,7 +57,7 @@ public record Product(
     public Product build() {
       return new Product(
           id,
-          uuid,
+          Optional.ofNullable(uuid).orElse(UUID.randomUUID()),
           name,
           dimensions,
           netWeight,

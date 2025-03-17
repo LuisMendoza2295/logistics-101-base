@@ -49,7 +49,7 @@ public record Transfer(
         public Transfer build() {
             return new Transfer(
                 id,
-                uuid,
+                Optional.ofNullable(uuid).orElse(UUID.randomUUID()),
                 source,
                 target,
                 stocks

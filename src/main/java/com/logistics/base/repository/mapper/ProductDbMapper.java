@@ -9,8 +9,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class ProductDbMapper {
 
     public ProductEntity toProductEntity(Product product) {
-        ProductEntity productEntity = new ProductEntity();
-        productEntity.setId(product.id());
+        ProductEntity temp = new ProductEntity();
+        temp.setId(product.id());
+
+        ProductEntity productEntity = temp.getAttachedEntity();
         productEntity.setUuid(product.uuid().toString());
         productEntity.setName(product.name());
         productEntity.setWidth(product.dimensions().width());
