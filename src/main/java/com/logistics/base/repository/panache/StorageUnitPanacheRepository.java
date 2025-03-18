@@ -12,10 +12,11 @@ public class StorageUnitPanacheRepository implements PanacheRepository<StorageUn
 
     public Optional<StorageUnitEntity> findByUuid(String uuid) {
         var query = getEntityManager().createQuery("SELECT su, p, count(p.id) " +
-            "FROM storageUnits su LEFT JOIN stocks s ON su.id = s.storageUnit.id " +
-            "JOIN products p ON p.id = s.product.id " +
+            "FROM storageUnits su " +
+            "LEFT JOIN stocks s ON su.id = s.storageUnit.id " +
+            "LEFT JOIN products p ON p.id = s.product.id " +
             "WHERE su.uuid = :uuid " +
-            "GROUP BY su, p", Object[].class);
+            "GROUP BY su.id, p.id", Object[].class);
         query.setParameter("uuid", uuid);
 
         return parseRows(query.getResultList()).stream().findFirst();
@@ -23,8 +24,9 @@ public class StorageUnitPanacheRepository implements PanacheRepository<StorageUn
 
     public Set<StorageUnitEntity> findWithProductsQtyByType(String storageType) {
         var query = getEntityManager().createQuery("SELECT su, p, count(p.id) " +
-            "FROM storageUnits su LEFT JOIN stocks s ON su.id = s.storageUnit.id " +
-            "JOIN products p ON p.id = s.product.id " +
+            "FROM storageUnits su " +
+            "LEFT JOIN stocks s ON su.id = s.storageUnit.id " +
+            "LEFT JOIN products p ON p.id = s.product.id " +
             "WHERE su.storageType = :type " +
             "GROUP BY su.id, p.id", Object[].class);
         query.setParameter("type", storageType);
@@ -45,7 +47,10 @@ public class StorageUnitPanacheRepository implements PanacheRepository<StorageUn
             if (storageUnitMap.containsKey(storageUnitEntity.id())) {
                 storageUnitEntity = storageUnitMap.get(storageUnitEntity.id());
             }
-            storageUnitEntity.addProductWithQty((ProductEntity) row[1], ((Long) row[2]).intValue());
+            ProductEntity productEntity = (ProductEntity) row[1];
+            if (productEntity != null) {
+                storageUnitEntity.addProductWithQty(productEntity, ((Long) row[2]).intValue());
+            }
             storageUnitMap.put(storageUnitEntity.id(), storageUnitEntity);
         }
         return new HashSet<>(storageUnitMap.values());
