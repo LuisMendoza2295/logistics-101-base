@@ -1,4 +1,4 @@
-package com.logistics.base.domain;
+package com.logistics.base.domain.model;
 
 public enum StorageStatus {
   AVAILABLE,

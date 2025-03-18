@@ -1,7 +1,7 @@
 package com.logistics.base.repository.mapper;
 
-import com.logistics.base.domain.Dimensions;
-import com.logistics.base.domain.StorageUnit;
+import com.logistics.base.domain.model.Dimensions;
+import com.logistics.base.domain.model.StorageUnit;
 import com.logistics.base.repository.entity.StorageUnitEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

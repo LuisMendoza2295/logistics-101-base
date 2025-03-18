@@ -1,4 +1,9 @@
-package com.logistics.base.domain;
+package com.logistics.base.domain.aggregate;
+
+import com.logistics.base.domain.model.Product;
+import com.logistics.base.domain.model.Stock;
+import com.logistics.base.domain.model.StorageUnit;
+import com.logistics.base.domain.model.Transfer;
 
 import java.time.LocalDate;
 import java.util.Set;

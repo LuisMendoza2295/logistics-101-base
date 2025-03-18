@@ -1,4 +1,4 @@
-package com.logistics.base.domain;
+package com.logistics.base.domain.model;
 
 import uk.org.okapibarcode.backend.Code128;
 

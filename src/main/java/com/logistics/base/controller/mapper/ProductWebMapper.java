@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.logistics.base.controller.dto.ProductDTO;
-import com.logistics.base.domain.Dimensions;
-import com.logistics.base.domain.Product;
+import com.logistics.base.domain.model.Dimensions;
+import com.logistics.base.domain.model.Product;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 

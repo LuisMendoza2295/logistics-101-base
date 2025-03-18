@@ -1,12 +1,13 @@
 package com.logistics.base.controller.mapper;
 
 import com.logistics.base.controller.dto.StorageUnitDTO;
-import com.logistics.base.domain.Dimensions;
-import com.logistics.base.domain.StorageUnit;
+import com.logistics.base.domain.model.Dimensions;
+import com.logistics.base.domain.model.StorageUnit;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -48,10 +49,9 @@ public class StorageWebMapper {
             .weightOccupied(storageUnitDTO.weightOccupied())
             .maxUnits(storageUnitDTO.maxUnits())
             .storageStatus(storageUnitDTO.storageStatus());
-        storageUnitDTO.productsWithQty()
-            .forEach(
-                (productDTO, qty) -> builder.addProduct(productWebMapper.toProduct(productDTO), qty)
-            );
+        Optional.ofNullable(storageUnitDTO.productsWithQty())
+            .ifPresent(productWithQty -> productWithQty
+                .forEach((productDTO, qty) -> builder.addProduct(productWebMapper.toProduct(productDTO), qty)));
         return builder.build();
     }
 }

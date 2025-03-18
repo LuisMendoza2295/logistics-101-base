@@ -1,7 +1,7 @@
 package com.logistics.base.repository.mapper;
 
-import com.logistics.base.domain.Dimensions;
-import com.logistics.base.domain.Product;
+import com.logistics.base.domain.model.Dimensions;
+import com.logistics.base.domain.model.Product;
 import com.logistics.base.repository.entity.ProductEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 

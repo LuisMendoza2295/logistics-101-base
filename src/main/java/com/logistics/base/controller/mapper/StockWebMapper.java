@@ -1,7 +1,7 @@
 package com.logistics.base.controller.mapper;
 
 import com.logistics.base.controller.dto.StockDTO;
-import com.logistics.base.domain.Stock;
+import com.logistics.base.domain.model.Stock;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -20,7 +20,9 @@ public class StockWebMapper {
             stock.barcode(),
             stock.expirationDate(),
             productWebMapper.toProductDTO(stock.product()),
-            Optional.ofNullable(stock.storageUnit()).map(storageUnit -> storageWebMapper.toStorageUnitDTO(storageUnit)).orElse(null));
+            Optional.ofNullable(stock.storageUnit())
+                .map(storageWebMapper::toStorageUnitDTO)
+                .orElse(null));
     }
 
     public Stock toStock(StockDTO stockDTO) {

@@ -1,6 +1,6 @@
 package com.logistics.base.repository.mapper;
 
-import com.logistics.base.domain.Transfer;
+import com.logistics.base.domain.model.Transfer;
 import com.logistics.base.repository.entity.TransferEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -22,20 +22,20 @@ public class TransferDbMapper {
         transferEntity.setSourceStorage(storageUniDbMapper.toStorageUnitEntity(transfer.source()));
         transferEntity.setTargetStorage(storageUniDbMapper.toStorageUnitEntity(transfer.target()));
         transfer.stocks().stream()
-            .map(stock -> stockDbMapper.toStockEntity(stock))
+            .map(stockDbMapper::toStockEntity)
             .forEach(transferEntity::addStock);
         return transferEntity;
     }
 
     public Transfer toTransfer(TransferEntity transferEntity) {
-        var transferBuilder = Transfer.builder()
+        var builder = Transfer.builder()
             .id(transferEntity.id())
             .uuid(transferEntity.uuid())
             .source(storageUniDbMapper.toStorageUnit(transferEntity.sourceStorage()))
             .target(storageUniDbMapper.toStorageUnit(transferEntity.targetStorage()));
         transferEntity.stocks().stream()
-            .map(stockEntity -> stockDbMapper.toStock(stockEntity))
-            .forEach(transferBuilder::addStock);
-        return transferBuilder.build();
+            .map(stockDbMapper::toStock)
+            .forEach(builder::addStock);
+        return builder.build();
     }
 }

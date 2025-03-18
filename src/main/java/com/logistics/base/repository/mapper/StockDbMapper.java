@@ -1,6 +1,6 @@
 package com.logistics.base.repository.mapper;
 
-import com.logistics.base.domain.Stock;
+import com.logistics.base.domain.model.Stock;
 import com.logistics.base.repository.entity.StockEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

@@ -2,8 +2,8 @@ package com.logistics.base.controller;
 
 import com.logistics.base.controller.dto.CreateTransferDTO;
 import com.logistics.base.controller.mapper.TransferWebMapper;
-import com.logistics.base.domain.LogisticAggregate;
-import com.logistics.base.domain.Transfer;
+import com.logistics.base.domain.aggregate.LogisticAggregate;
+import com.logistics.base.domain.model.Transfer;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;

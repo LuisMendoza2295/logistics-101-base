@@ -19,5 +19,4 @@ public record StorageUnitDTO(
     String storageStatus,
     @JsonDeserialize(keyUsing = ProductWebMapper.class)
     Map<ProductDTO, Integer> productsWithQty) {
-
 }

@@ -1,4 +1,4 @@
-package com.logistics.base.repository;
+package com.logistics.base.repository.panache;
 
 import com.logistics.base.repository.entity.ProductEntity;
 import com.logistics.base.repository.entity.StorageUnitEntity;
@@ -8,7 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.*;
 
 @ApplicationScoped
-public class StorageUnitRepository implements PanacheRepository<StorageUnitEntity> {
+public class StorageUnitPanacheRepository implements PanacheRepository<StorageUnitEntity> {
 
     public Optional<StorageUnitEntity> findByUuid(String uuid) {
         var query = getEntityManager().createQuery("SELECT su, p, count(p.id) " +
@@ -26,7 +26,7 @@ public class StorageUnitRepository implements PanacheRepository<StorageUnitEntit
             "FROM storageUnits su LEFT JOIN stocks s ON su.id = s.storageUnit.id " +
             "JOIN products p ON p.id = s.product.id " +
             "WHERE su.storageType = :type " +
-            "GROUP BY su, p", Object[].class);
+            "GROUP BY su.id, p.id", Object[].class);
         query.setParameter("type", storageType);
 
         return parseRows(query.getResultList());

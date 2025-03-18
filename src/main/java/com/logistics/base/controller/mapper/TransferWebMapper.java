@@ -1,7 +1,7 @@
 package com.logistics.base.controller.mapper;
 
 import com.logistics.base.controller.dto.TransferDTO;
-import com.logistics.base.domain.Transfer;
+import com.logistics.base.domain.model.Transfer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -21,7 +21,7 @@ public class TransferWebMapper {
             storageWebMapper.toStorageUnitDTO(transfer.source()),
             storageWebMapper.toStorageUnitDTO(transfer.target()),
             transfer.stocks().stream()
-                .map(stock -> stockWebMapper.toStockDTO(stock))
+                .map(stockWebMapper::toStockDTO)
                 .collect(Collectors.toSet())
         );
     }
@@ -30,10 +30,10 @@ public class TransferWebMapper {
         var builder = Transfer.builder()
             .uuid(transferDTO.uuid())
             .source(storageWebMapper.toStorageUnit(transferDTO.sourceStorageUnitDTO()))
-            .target(storageWebMapper.toStorageUnit(transferDTO.targetStorageUnitDTO()))
-            .build();
-        transferDTO.stockDTOs()
-            .forEach(stockDTO -> stockWebMapper.toStock(stockDTO));
-        return builder;
+            .target(storageWebMapper.toStorageUnit(transferDTO.targetStorageUnitDTO()));
+        transferDTO.stockDTOs().stream()
+            .map(stockWebMapper::toStock)
+            .forEach(builder::addStock);
+        return builder.build();
     }
 }
