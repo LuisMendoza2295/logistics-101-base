@@ -20,7 +20,7 @@ public class ProductDbMapper {
         productEntity.setLength(product.dimensions().length());
         productEntity.setNetWeight(product.netWeight());
         productEntity.setGrossWeight(product.grossWeight());
-        return productEntity.getAttachedEntity();
+        return productEntity;
     }
 
     public Product toProduct(ProductEntity productEntity) {

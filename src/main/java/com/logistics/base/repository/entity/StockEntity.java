@@ -76,6 +76,10 @@ public class StockEntity extends PanacheEntityBase {
         if (this.id == null) {
             return this;
         }
-        return getEntityManager().merge(this);
+        try {
+            return getEntityManager().merge(this);
+        } catch (Exception e) {
+            return this;
+        }
     }
 }

@@ -2,7 +2,6 @@ package com.logistics.base.domain.repository;
 
 import com.logistics.base.domain.model.Stock;
 
-import java.util.List;
 import java.util.Set;
 
 public interface StockRepository {

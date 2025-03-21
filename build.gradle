@@ -10,8 +10,6 @@ repositories {
 
 dependencies {
     implementation 'io.quarkus:quarkus-container-image-docker'
-//    implementation 'org.slf4j:slf4j-api:1.7.30'
-//    implementation 'org.jboss.logging:jboss-logging:3.6.1.Final'
     implementation 'io.quarkus:quarkus-micrometer'
     implementation 'io.quarkiverse.barcode:quarkus-okapi:1.0.0'
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
@@ -21,7 +19,10 @@ dependencies {
     implementation"io.quarkus:quarkus-rest-jackson"
     implementation 'io.quarkus:quarkus-jdbc-postgresql'
     testImplementation 'io.quarkus:quarkus-junit5'
+    testImplementation 'io.quarkus:quarkus-junit5-component'
+    testImplementation 'io.quarkus:quarkus-junit5-mockito'
     testImplementation 'io.rest-assured:rest-assured'
+    testImplementation 'org.assertj:assertj-core:3.26.3'
 }
 
 group 'com.logistics'

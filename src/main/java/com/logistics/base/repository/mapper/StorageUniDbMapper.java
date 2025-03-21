@@ -34,7 +34,7 @@ public class StorageUniDbMapper {
             .forEach(
                 (product, qty) -> storageUnitEntity.addProductWithQty(productDbMapper.toProductEntity(product), qty)
             );
-        return storageUnitEntity.getAttachedEntity();
+        return storageUnitEntity;
     }
 
     public StorageUnit toStorageUnit(StorageUnitEntity storageUnitEntity) {

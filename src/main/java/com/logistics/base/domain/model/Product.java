@@ -15,6 +15,24 @@ public record Product(
     BigDecimal netWeight,
     BigDecimal grossWeight) {
 
+  public Product {
+    if (uuid == null) {
+      throw new IllegalArgumentException("UUID cannot be null");
+    }
+    if (name == null) {
+      throw new IllegalArgumentException("Name cannot be null");
+    }
+    if (dimensions == null) {
+      throw new IllegalArgumentException("Product dimensions cannot be null");
+    }
+    if (netWeight == null) {
+      throw new IllegalArgumentException("Product netWeight cannot be null");
+    }
+    if (grossWeight == null) {
+      throw new IllegalArgumentException("Product grossWeight cannot be null");
+    }
+  }
+
   public static final class Builder {
     private Long id;
     private UUID uuid;

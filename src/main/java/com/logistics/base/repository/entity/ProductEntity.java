@@ -14,6 +14,7 @@ public class ProductEntity extends PanacheEntityBase {
   private Long id;
   @Column(unique = true)
   private String uuid;
+  @Column(unique = true)
   private String name;
   private BigDecimal width;
   private BigDecimal height;
@@ -97,6 +98,10 @@ public class ProductEntity extends PanacheEntityBase {
     if (this.id == null) {
       return this;
     }
-    return getEntityManager().merge(this);
+    try {
+      return getEntityManager().merge(this);
+    } catch (Exception e) {
+      return this;
+    }
   }
 }
