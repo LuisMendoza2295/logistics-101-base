@@ -20,19 +20,19 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class LogisticAggregateTest {
 
-    @InjectMocks
-    final LogisticAggregate logisticAggregate = new LogisticService();
-    @Mock
-    ProductRepository productRepository;
+  @InjectMocks
+  final LogisticAggregate logisticAggregate = new LogisticService();
+  @Mock
+  ProductRepository productRepository;
 
-    @Test
-    @DisplayName("Given uuid then return product")
-    void testFindProductByProductUuid() {
-        when(productRepository.findByUuid(PRODUCT_UUID)).thenReturn(Optional.of(PRODUCT));
+  @Test
+  @DisplayName("Given uuid then return product")
+  void testFindProductByProductUuid() {
+    when(productRepository.findByUuid(PRODUCT_UUID.toString())).thenReturn(Optional.of(PRODUCT));
 
-        Product result = logisticAggregate.findByProductUuid(PRODUCT_UUID);
+    Product result = logisticAggregate.findByProductUuid(PRODUCT_UUID.toString());
 
-        assertNotNull(result);
-        assertEquals(PRODUCT, result);
-    }
+    assertNotNull(result);
+    assertEquals(PRODUCT, result);
+  }
 }

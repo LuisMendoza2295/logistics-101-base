@@ -22,26 +22,26 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class ProductRepositoryTest {
 
-    @InjectMocks
-    ProductRepository productRepository = new ProductRepositoryImpl();
-    @Mock
-    ProductPanacheRepository productPanacheRepository;
-    @Mock
-    ProductDbMapper productDbMapper;
+  @InjectMocks
+  ProductRepository productRepository = new ProductRepositoryImpl();
+  @Mock
+  ProductPanacheRepository productPanacheRepository;
+  @Mock
+  ProductDbMapper productDbMapper;
 
-    @BeforeEach
-    void setUp() {
-        when(productDbMapper.toProductEntity(any(Product.class))).thenCallRealMethod();
-        when(productDbMapper.toProduct(any(ProductEntity.class))).thenCallRealMethod();
-    }
+  @BeforeEach
+  void setUp() {
+    when(productDbMapper.toProductEntity(any(Product.class))).thenCallRealMethod();
+    when(productDbMapper.toProduct(any(ProductEntity.class))).thenCallRealMethod();
+  }
 
-    @Test
-    @DisplayName("Given uuid then return product")
-    void testGetProduct() {
-        ProductEntity productEntity = productDbMapper.toProductEntity(PRODUCT);
-        when(productPanacheRepository.findByUuid(PRODUCT_UUID)).thenReturn(Optional.of(productEntity));
+  @Test
+  @DisplayName("Given uuid then return product")
+  void testGetProduct() {
+    ProductEntity productEntity = productDbMapper.toProductEntity(PRODUCT);
+    when(productPanacheRepository.findByUuid(PRODUCT_UUID.toString())).thenReturn(Optional.of(productEntity));
 
-        Optional<Product> productOptional = productRepository.findByUuid(PRODUCT_UUID);
-        assertThat(productOptional).isPresent().hasValue(PRODUCT);
-    }
+    Optional<Product> productOptional = productRepository.findByUuid(PRODUCT_UUID.toString());
+    assertThat(productOptional).isPresent().hasValue(PRODUCT);
+  }
 }

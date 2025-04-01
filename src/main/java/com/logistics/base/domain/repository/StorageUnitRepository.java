@@ -7,11 +7,11 @@ import java.util.Set;
 
 public interface StorageUnitRepository {
 
-    Optional<StorageUnit> findByUuid(String uuid);
+  Optional<StorageUnit> findByUuid(String uuid);
 
-    Set<StorageUnit> findWithProductsQtyByType(String storageType);
+  Set<StorageUnit> findWithProductsQtyByType(String storageType);
 
-    Set<StorageUnit> saveAll(Set<StorageUnit> storageUnits);
+  Set<StorageUnit> saveAll(Set<StorageUnit> storageUnits);
 
-    StorageUnit save(StorageUnit storageUnit);
+  StorageUnit save(StorageUnit storageUnit);
 }

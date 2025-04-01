@@ -19,50 +19,50 @@ import static org.junit.jupiter.api.Assertions.*;
 @QuarkusTest
 public class ProductPanacheRepositoryTest {
 
-    @Inject
-    ProductPanacheRepository repository;
-    @Inject
-    ProductDbMapper mapper;
+  @Inject
+  ProductPanacheRepository repository;
+  @Inject
+  ProductDbMapper mapper;
 
-    @Test
-    @TestTransaction
-    @DisplayName("Given default product insert successfully")
-    void testInsertDefaultProduct() {
-        ProductEntity productEntity = mapper.toProductEntity(PRODUCT_ID_NULL);
-        repository.persist(productEntity);
+  @Test
+  @TestTransaction
+  @DisplayName("Given default product insert successfully")
+  void testInsertDefaultProduct() {
+    ProductEntity productEntity = mapper.toProductEntity(PRODUCT_ID_NULL);
+    repository.persist(productEntity);
 
-        assertNotNull(productEntity);
-        assertEquals(PRODUCT_UUID, productEntity.uuid());
-    }
+    assertNotNull(productEntity);
+    assertEquals(PRODUCT_UUID.toString(), productEntity.uuid());
+  }
 
-    @Test
-    @TestTransaction
-    @DisplayName("Given default product throw error when inserting duplicate name product")
-    void testInsertDuplicateNameProduct() {
-        ProductEntity productEntity = mapper.toProductEntity(PRODUCT_ID_NULL);
-        repository.persist(productEntity);
+  @Test
+  @TestTransaction
+  @DisplayName("Given default product throw error when inserting duplicate name product")
+  void testInsertDuplicateNameProduct() {
+    ProductEntity productEntity = mapper.toProductEntity(PRODUCT_ID_NULL);
+    repository.persist(productEntity);
 
-        assertNotNull(productEntity);
-        assertEquals(PRODUCT_UUID, productEntity.uuid());
+    assertNotNull(productEntity);
+    assertEquals(PRODUCT_UUID.toString(), productEntity.uuid());
 
-        ProductEntity duplicateProductEntity = mapper.toProductEntity(PRODUCT_ID_NULL.toBuilder()
-            .uuid(UUID.randomUUID())
-            .build());
-        assertThrows(ConstraintViolationException.class, () -> repository.persist(duplicateProductEntity));
-    }
+    ProductEntity duplicateProductEntity = mapper.toProductEntity(PRODUCT_ID_NULL.toBuilder()
+      .uuid(UUID.randomUUID())
+      .build());
+    assertThrows(ConstraintViolationException.class, () -> repository.persist(duplicateProductEntity));
+  }
 
-    @Test
-    @TestTransaction
-    @DisplayName("Insert default product and get it by uuid")
-    void testGetProduct() {
-        ProductEntity productEntity = mapper.toProductEntity(PRODUCT.toBuilder().id(null).build());
-        repository.persist(productEntity);
+  @Test
+  @TestTransaction
+  @DisplayName("Insert default product and get it by uuid")
+  void testGetProduct() {
+    ProductEntity productEntity = mapper.toProductEntity(PRODUCT_ID_NULL);
+    repository.persist(productEntity);
 
-        Optional<ProductEntity> fetchedProductEntity = repository.findByUuid(PRODUCT_UUID);
-        assertThat(fetchedProductEntity)
-            .isPresent()
-            .hasValueSatisfying(
-                entity -> assertThat(entity.uuid())
-                    .isEqualTo(PRODUCT_UUID));
-    }
+    Optional<ProductEntity> fetchedProductEntity = repository.findByUuid(PRODUCT_UUID.toString());
+    assertThat(fetchedProductEntity)
+      .isPresent()
+      .hasValueSatisfying(
+        entity -> assertThat(entity.uuid())
+          .isEqualTo(PRODUCT_UUID.toString()));
+  }
 }

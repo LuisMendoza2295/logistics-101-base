@@ -6,9 +6,9 @@ import java.util.Set;
 
 public interface StockRepository {
 
-    Set<Stock> findByBarcodes(Set<String> barcodes);
+  Set<Stock> findByBarcodes(Set<String> barcodes);
 
-    Set<Stock> findByStorageUuidAndBarcodes(String storageUuid, Set<String> barcodes);
+  Set<Stock> findByStorageUuidAndBarcodes(String storageUuid, Set<String> barcodes);
 
-    Set<Stock> saveAll(Set<Stock> stocks);
+  Set<Stock> saveAll(Set<Stock> stocks);
 }

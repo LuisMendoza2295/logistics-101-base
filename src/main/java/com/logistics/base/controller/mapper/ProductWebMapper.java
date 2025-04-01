@@ -14,35 +14,36 @@ import java.io.IOException;
 @ApplicationScoped
 public class ProductWebMapper extends KeyDeserializer {
 
-    @Inject
-    ObjectMapper objectMapper;
+  @Inject
+  ObjectMapper objectMapper;
 
-    public ProductDTO toProductDTO(Product product) {
-        return new ProductDTO(
-            product.uuid().toString(),
-            product.name(),
-            product.dimensions().height(),
-            product.dimensions().width(),
-            product.dimensions().length(),
-            product.netWeight(),
-            product.grossWeight());
-    }
+  public ProductDTO toProductDTO(Product product) {
+    return new ProductDTO(
+      product.uuid().toString(),
+      product.name(),
+      product.dimensions().height(),
+      product.dimensions().width(),
+      product.dimensions().length(),
+      product.netWeight(),
+      product.grossWeight());
+  }
 
-    public Product toProduct(ProductDTO productDTO) {
-        return Product.builder()
-            .uuid(productDTO.uuid())
-            .name(productDTO.name())
-            .dimensions(new Dimensions(
-                productDTO.width(),
-                productDTO.height(),
-                productDTO.length()))
-            .netWeight(productDTO.netWeight())
-            .grossWeight(productDTO.grossWeight())
-            .build();
-    }
+  public Product toProduct(ProductDTO productDTO) {
+    return Product.builder()
+      .uuid(productDTO.uuid())
+      .name(productDTO.name())
+      .dimensions(Dimensions.builder()
+        .width(productDTO.width())
+        .height(productDTO.height())
+        .length(productDTO.length())
+        .build())
+      .netWeight(productDTO.netWeight())
+      .grossWeight(productDTO.grossWeight())
+      .build();
+  }
 
-    @Override
-    public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-        return objectMapper.readValue(key, ProductDTO.class);
-    }
+  @Override
+  public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+    return objectMapper.readValue(key, ProductDTO.class);
+  }
 }

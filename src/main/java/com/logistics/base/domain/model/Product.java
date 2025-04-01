@@ -8,12 +8,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public record Product(
-    Long id,
-    UUID uuid,
-    String name,
-    Dimensions dimensions,
-    BigDecimal netWeight,
-    BigDecimal grossWeight) {
+  Long id,
+  UUID uuid,
+  String name,
+  Dimensions dimensions,
+  BigDecimal netWeight,
+  BigDecimal grossWeight) {
 
   public Product {
     if (uuid == null) {
@@ -25,61 +25,14 @@ public record Product(
     if (dimensions == null) {
       throw new IllegalArgumentException("Product dimensions cannot be null");
     }
+    if (dimensions.hasInvalidDimensions()) {
+      throw new IllegalArgumentException("Value cannot be zero or negative");
+    }
     if (netWeight == null) {
       throw new IllegalArgumentException("Product netWeight cannot be null");
     }
     if (grossWeight == null) {
       throw new IllegalArgumentException("Product grossWeight cannot be null");
-    }
-  }
-
-  public static final class Builder {
-    private Long id;
-    private UUID uuid;
-    private String name;
-    private Dimensions dimensions;
-    private BigDecimal netWeight;
-    private BigDecimal grossWeight;
-    private Builder() {
-    }
-
-    public Builder id(Long id) {
-      this.id = id;
-      return this;
-    }
-    public Builder uuid(String uuid) {
-      this.uuid = Optional.ofNullable(uuid).map(UUID::fromString).orElse(UUID.randomUUID());
-      return this;
-    }
-    public Builder uuid(UUID uuid) {
-      this.uuid = uuid;
-      return this;
-    }
-    public Builder name(String name) {
-      this.name = name;
-      return this;
-    }
-    public Builder dimensions(Dimensions dimensions) {
-      this.dimensions = dimensions;
-      return this;
-    }
-    public Builder netWeight(BigDecimal netWeight) {
-      this.netWeight = netWeight;
-      return this;
-    }
-    public Builder grossWeight(BigDecimal grossWeight) {
-      this.grossWeight = grossWeight;
-      return this;
-    }
-
-    public Product build() {
-      return new Product(
-          id,
-          Optional.ofNullable(uuid).orElse(UUID.randomUUID()),
-          name,
-          dimensions,
-          netWeight,
-          grossWeight);
     }
   }
 
@@ -102,10 +55,75 @@ public record Product(
     Code128 barcode = new Code128();
     barcode.setContent(UUID.randomUUID().toString());
     return Stock.builder()
-        .barcode(barcode.getContent())
-        .expirationDate(expirationDate)
-        .product(this)
-        .storageUnit(null)
-        .build();
+      .barcode(barcode.getContent())
+      .expirationDate(expirationDate)
+      .product(this)
+      .storageUnit(null)
+      .build();
+  }
+
+  public BigDecimal calculateGrossWeight(int quantity) {
+    return this.grossWeight.multiply(BigDecimal.valueOf(quantity));
+  }
+
+  public Dimensions calculateDimensions(int quantity) {
+    return this.dimensions.multiply(quantity);
+  }
+
+  public static final class Builder {
+    private Long id;
+    private UUID uuid;
+    private String name;
+    private Dimensions dimensions;
+    private BigDecimal netWeight;
+    private BigDecimal grossWeight;
+
+    private Builder() {
+    }
+
+    public Builder id(Long id) {
+      this.id = id;
+      return this;
+    }
+
+    public Builder uuid(String uuid) {
+      this.uuid = Optional.ofNullable(uuid).map(UUID::fromString).orElse(UUID.randomUUID());
+      return this;
+    }
+
+    public Builder uuid(UUID uuid) {
+      this.uuid = uuid;
+      return this;
+    }
+
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder dimensions(Dimensions dimensions) {
+      this.dimensions = dimensions;
+      return this;
+    }
+
+    public Builder netWeight(BigDecimal netWeight) {
+      this.netWeight = netWeight;
+      return this;
+    }
+
+    public Builder grossWeight(BigDecimal grossWeight) {
+      this.grossWeight = grossWeight;
+      return this;
+    }
+
+    public Product build() {
+      return new Product(
+        id,
+        Optional.ofNullable(uuid).orElse(UUID.randomUUID()),
+        name,
+        dimensions,
+        netWeight,
+        grossWeight);
+    }
   }
 }

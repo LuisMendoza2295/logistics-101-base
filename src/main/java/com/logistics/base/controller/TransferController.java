@@ -17,17 +17,17 @@ import static jakarta.ws.rs.core.Response.Status.CREATED;
 @Path("/transfer")
 public class TransferController {
 
-    @Inject
-    LogisticAggregate logisticAggregate;
+  @Inject
+  LogisticAggregate logisticAggregate;
 
-    @Inject
-    TransferWebMapper transferWebMapper;
+  @Inject
+  TransferWebMapper transferWebMapper;
 
-    @POST
-    @Produces(APPLICATION_JSON)
-    @Consumes(APPLICATION_JSON)
-    public Response transferStock(CreateTransferDTO createTransferDTO) {
-        Transfer transfer = logisticAggregate.transferProduct(createTransferDTO.sourceStorageUUID(), createTransferDTO.targetStorageUUID(), createTransferDTO.barcodes());
-        return Response.status(CREATED).entity(transferWebMapper.toTransferDTO(transfer)).build();
-    }
+  @POST
+  @Produces(APPLICATION_JSON)
+  @Consumes(APPLICATION_JSON)
+  public Response transferStock(CreateTransferDTO createTransferDTO) {
+    Transfer transfer = logisticAggregate.transferProduct(createTransferDTO.sourceStorageUUID(), createTransferDTO.targetStorageUUID(), createTransferDTO.barcodes());
+    return Response.status(CREATED).entity(transferWebMapper.toTransferDTO(transfer)).build();
+  }
 }

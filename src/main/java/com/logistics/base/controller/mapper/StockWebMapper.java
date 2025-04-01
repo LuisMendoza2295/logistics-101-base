@@ -10,27 +10,27 @@ import java.util.Optional;
 @ApplicationScoped
 public class StockWebMapper {
 
-    @Inject
-    ProductWebMapper productWebMapper;
-    @Inject
-    StorageWebMapper storageWebMapper;
+  @Inject
+  ProductWebMapper productWebMapper;
+  @Inject
+  StorageWebMapper storageWebMapper;
 
-    public StockDTO toStockDTO(Stock stock) {
-        return new StockDTO(
-            stock.barcode(),
-            stock.expirationDate(),
-            productWebMapper.toProductDTO(stock.product()),
-            Optional.ofNullable(stock.storageUnit())
-                .map(storageWebMapper::toStorageUnitDTO)
-                .orElse(null));
-    }
+  public StockDTO toStockDTO(Stock stock) {
+    return new StockDTO(
+      stock.barcode(),
+      stock.expirationDate(),
+      productWebMapper.toProductDTO(stock.product()),
+      Optional.ofNullable(stock.storageUnit())
+        .map(storageWebMapper::toStorageUnitDTO)
+        .orElse(null));
+  }
 
-    public Stock toStock(StockDTO stockDTO) {
-        return Stock.builder()
-            .barcode(stockDTO.barcode())
-            .expirationDate(stockDTO.expirationDate())
-            .product(productWebMapper.toProduct(stockDTO.product()))
-            .storageUnit(storageWebMapper.toStorageUnit(stockDTO.storageUnit()))
-            .build();
-    }
+  public Stock toStock(StockDTO stockDTO) {
+    return Stock.builder()
+      .barcode(stockDTO.barcode())
+      .expirationDate(stockDTO.expirationDate())
+      .product(productWebMapper.toProduct(stockDTO.product()))
+      .storageUnit(storageWebMapper.toStorageUnit(stockDTO.storageUnit()))
+      .build();
+  }
 }

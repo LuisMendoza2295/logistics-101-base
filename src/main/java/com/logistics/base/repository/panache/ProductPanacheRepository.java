@@ -21,11 +21,11 @@ public class ProductPanacheRepository implements PanacheRepository<ProductEntity
 
   public Set<ProductEntity> findByProductName(String productName) {
     return find("productName", productName).stream()
-        .collect(Collectors.toSet());
+      .collect(Collectors.toSet());
   }
 
   public Set<ProductEntity> findByProductUUID(Set<String> productUUIDs) {
     return find("uuid in ?1", productUUIDs).stream()
-        .collect(Collectors.toSet());
+      .collect(Collectors.toSet());
   }
 }

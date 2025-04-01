@@ -7,16 +7,16 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 public record StorageUnitDTO(
-    String uuid,
-    String storageType,
-    BigDecimal height,
-    BigDecimal width,
-    BigDecimal length,
-    BigDecimal weightCapacity,
-    BigDecimal volumeOccupied,
-    BigDecimal weightOccupied,
-    int maxUnits,
-    String storageStatus,
-    @JsonDeserialize(keyUsing = ProductWebMapper.class)
-    Map<ProductDTO, Integer> productsWithQty) {
+  String uuid,
+  String storageType,
+  BigDecimal height,
+  BigDecimal width,
+  BigDecimal length,
+  BigDecimal weightCapacity,
+  BigDecimal volumeOccupied,
+  BigDecimal weightOccupied,
+  int maxUnits,
+  String storageStatus,
+  @JsonDeserialize(keyUsing = ProductWebMapper.class)
+  Map<ProductDTO, Integer> productsWithQty) {
 }

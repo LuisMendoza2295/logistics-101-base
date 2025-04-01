@@ -10,21 +10,21 @@ import java.util.Set;
 
 public interface LogisticAggregate {
 
-    Product findByProductUuid(String uuid);
+  Product findByProductUuid(String uuid);
 
-    Product persistProduct(Product product);
+  Product persistProduct(Product product);
 
-    StorageUnit findByStorageUnitUuid(String storageUnitUUID);
+  StorageUnit findByStorageUnitUuid(String storageUnitUUID);
 
-    StorageUnit persistStorageUnit(StorageUnit storageUnit);
+  StorageUnit persistStorageUnit(StorageUnit storageUnit);
 
-    StorageUnit addProducts(String storageUnitUUID, Set<String> barcodes);
+  StorageUnit addProducts(String storageUnitUUID, Set<String> barcodes);
 
-    Set<StorageUnit> findByType(String storageType);
+  Set<StorageUnit> findByType(String storageType);
 
-    Transfer transferProduct(String sourceStorageUUID, String targetStorageUUID, Set<String> barcodes);
+  Transfer transferProduct(String sourceStorageUUID, String targetStorageUUID, Set<String> barcodes);
 
-    Set<Stock> generateStocks(String storageUnitUUID, String productUUID, LocalDate expirationDate, Integer quantity);
+  Set<Stock> generateStocks(String storageUnitUUID, String productUUID, LocalDate expirationDate, Integer quantity);
 
-    Set<Stock> generateStocks(String productUUID, LocalDate expirationDate, Integer quantity);
+  Set<Stock> generateStocks(String productUUID, LocalDate expirationDate, Integer quantity);
 }

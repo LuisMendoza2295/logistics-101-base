@@ -15,33 +15,33 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class StockRepositoryImpl implements StockRepository {
 
-    @Inject
-    StockPanacheRepository stockPanacheRepository;
-    @Inject
-    StockDbMapper stockDbMapper;
+  @Inject
+  StockPanacheRepository stockPanacheRepository;
+  @Inject
+  StockDbMapper stockDbMapper;
 
-    @Override
-    public Set<Stock> findByBarcodes(Set<String> barcodes) {
-        return stockPanacheRepository.findByBarcodes(new ArrayList<>(barcodes)).stream()
-            .map(stockDbMapper::toStock)
-            .collect(Collectors.toSet());
-    }
+  @Override
+  public Set<Stock> findByBarcodes(Set<String> barcodes) {
+    return stockPanacheRepository.findByBarcodes(new ArrayList<>(barcodes)).stream()
+      .map(stockDbMapper::toStock)
+      .collect(Collectors.toSet());
+  }
 
-    @Override
-    public Set<Stock> findByStorageUuidAndBarcodes(String storageUuid, Set<String> barcodes) {
-        return stockPanacheRepository.findByStorageUuidAndBarcodes(storageUuid, new ArrayList<>(barcodes)).stream()
-            .map(stockDbMapper::toStock)
-            .collect(Collectors.toSet());
-    }
+  @Override
+  public Set<Stock> findByStorageUuidAndBarcodes(String storageUuid, Set<String> barcodes) {
+    return stockPanacheRepository.findByStorageUuidAndBarcodes(storageUuid, new ArrayList<>(barcodes)).stream()
+      .map(stockDbMapper::toStock)
+      .collect(Collectors.toSet());
+  }
 
-    @Override
-    public Set<Stock> saveAll(Set<Stock> stocks) {
-        Set<StockEntity> stockEntities = stocks.stream()
-            .map(stockDbMapper::toStockEntity)
-            .collect(Collectors.toSet());
-        stockPanacheRepository.persist(stockEntities);
-        return stockEntities.stream()
-            .map(stockDbMapper::toStock)
-            .collect(Collectors.toSet());
-    }
+  @Override
+  public Set<Stock> saveAll(Set<Stock> stocks) {
+    Set<StockEntity> stockEntities = stocks.stream()
+      .map(stockDbMapper::toStockEntity)
+      .collect(Collectors.toSet());
+    stockPanacheRepository.persist(stockEntities);
+    return stockEntities.stream()
+      .map(stockDbMapper::toStock)
+      .collect(Collectors.toSet());
+  }
 }

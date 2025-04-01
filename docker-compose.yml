@@ -21,7 +21,7 @@ services:
       - POSTGRES_PASSWORD=log101
       - POSTGRES_DB=logistics
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U logistics"]
+      test: [ "CMD-SHELL", "pg_isready -U logistics" ]
       interval: 5s
       timeout: 5s
       retries: 10

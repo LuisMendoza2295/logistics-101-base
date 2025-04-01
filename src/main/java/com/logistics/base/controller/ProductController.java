@@ -20,41 +20,41 @@ import static jakarta.ws.rs.core.Response.Status.CREATED;
 @Path("/product")
 public class ProductController {
 
-    @Inject
-    LogisticAggregate logisticAggregate;
-    @Inject
-    ProductWebMapper productWebMapper;
-    @Inject
-    StockWebMapper stockWebMapper;
+  @Inject
+  LogisticAggregate logisticAggregate;
+  @Inject
+  ProductWebMapper productWebMapper;
+  @Inject
+  StockWebMapper stockWebMapper;
 
-    @GET
-    @Path("{uuid}")
-    @Produces(APPLICATION_JSON)
-    public Response getProduct(String uuid) {
-        Product product = logisticAggregate.findByProductUuid(uuid);
-        return Response.ok(productWebMapper.toProductDTO(product)).build();
-    }
+  @GET
+  @Path("{uuid}")
+  @Produces(APPLICATION_JSON)
+  public Response getProduct(String uuid) {
+    Product product = logisticAggregate.findByProductUuid(uuid);
+    return Response.ok(productWebMapper.toProductDTO(product)).build();
+  }
 
-    @POST
-    @Produces(APPLICATION_JSON)
-    @Consumes(APPLICATION_JSON)
-    public Response createProduct(ProductDTO productDTO) {
-        Product product = logisticAggregate.persistProduct(productWebMapper.toProduct(productDTO));
-        return Response.status(CREATED).entity(productWebMapper.toProductDTO(product)).build();
-    }
+  @POST
+  @Produces(APPLICATION_JSON)
+  @Consumes(APPLICATION_JSON)
+  public Response createProduct(ProductDTO productDTO) {
+    Product product = logisticAggregate.persistProduct(productWebMapper.toProduct(productDTO));
+    return Response.status(CREATED).entity(productWebMapper.toProductDTO(product)).build();
+  }
 
-    @POST
-    @Path("{uuid}/generate")
-    @Produces(APPLICATION_JSON)
-    @Consumes(APPLICATION_JSON)
-    public Response generateStock(String uuid, GenerateStockDTO generateStockDTO) {
-        Set<StockDTO> stockDTOs = logisticAggregate.generateStocks(
-                uuid,
-                generateStockDTO.expirationDate(),
-                generateStockDTO.quantity())
-            .stream()
-            .map(stockWebMapper::toStockDTO).collect(Collectors.toSet());
-        return Response.status(CREATED).entity(stockDTOs).build();
-    }
+  @POST
+  @Path("{uuid}/generate")
+  @Produces(APPLICATION_JSON)
+  @Consumes(APPLICATION_JSON)
+  public Response generateStock(String uuid, GenerateStockDTO generateStockDTO) {
+    Set<StockDTO> stockDTOs = logisticAggregate.generateStocks(
+        uuid,
+        generateStockDTO.expirationDate(),
+        generateStockDTO.quantity())
+      .stream()
+      .map(stockWebMapper::toStockDTO).collect(Collectors.toSet());
+    return Response.status(CREATED).entity(stockDTOs).build();
+  }
 }
 
