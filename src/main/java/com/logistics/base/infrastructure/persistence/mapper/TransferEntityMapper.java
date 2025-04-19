@@ -1,17 +1,17 @@
-package com.logistics.base.repository.mapper;
+package com.logistics.base.infrastructure.persistence.mapper;
 
 import com.logistics.base.domain.model.Transfer;
-import com.logistics.base.repository.entity.TransferEntity;
+import com.logistics.base.infrastructure.persistence.entity.TransferEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
-public class TransferDbMapper {
+public class TransferEntityMapper {
 
   @Inject
-  StorageUniDbMapper storageUniDbMapper;
+  StorageUnitEntityMapper storageUnitEntityMapper;
   @Inject
-  StockDbMapper stockDbMapper;
+  StockEntityMapper stockEntityMapper;
 
   public TransferEntity toTransferEntity(Transfer transfer) {
     TransferEntity temp = new TransferEntity();
@@ -19,10 +19,10 @@ public class TransferDbMapper {
 
     TransferEntity transferEntity = temp.getAttachedEntity();
     transferEntity.setUuid(transfer.uuid().toString());
-    transferEntity.setSourceStorage(storageUniDbMapper.toStorageUnitEntity(transfer.source()));
-    transferEntity.setTargetStorage(storageUniDbMapper.toStorageUnitEntity(transfer.target()));
+    transferEntity.setSourceStorage(storageUnitEntityMapper.toStorageUnitEntity(transfer.source()));
+    transferEntity.setTargetStorage(storageUnitEntityMapper.toStorageUnitEntity(transfer.target()));
     transfer.stocks().stream()
-      .map(stockDbMapper::toStockEntity)
+      .map(stockEntityMapper::toStockEntity)
       .forEach(transferEntity::addStock);
     return transferEntity;
   }
@@ -31,10 +31,10 @@ public class TransferDbMapper {
     var builder = Transfer.builder()
       .id(transferEntity.id())
       .uuid(transferEntity.uuid())
-      .source(storageUniDbMapper.toStorageUnit(transferEntity.sourceStorage()))
-      .target(storageUniDbMapper.toStorageUnit(transferEntity.targetStorage()));
+      .source(storageUnitEntityMapper.toStorageUnit(transferEntity.sourceStorage()))
+      .target(storageUnitEntityMapper.toStorageUnit(transferEntity.targetStorage()));
     transferEntity.stocks().stream()
-      .map(stockDbMapper::toStock)
+      .map(stockEntityMapper::toStock)
       .forEach(builder::addStock);
     return builder.build();
   }

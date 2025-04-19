@@ -2,9 +2,9 @@ package com.logistics.base.repository;
 
 import com.logistics.base.domain.model.Transfer;
 import com.logistics.base.domain.repository.TransferRepository;
-import com.logistics.base.repository.entity.TransferEntity;
-import com.logistics.base.repository.mapper.TransferDbMapper;
-import com.logistics.base.repository.panache.TransferPanacheRepository;
+import com.logistics.base.infrastructure.persistence.entity.TransferEntity;
+import com.logistics.base.infrastructure.persistence.mapper.TransferEntityMapper;
+import com.logistics.base.infrastructure.persistence.TransferPanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -18,25 +18,25 @@ public class TransferRepositoryImpl implements TransferRepository {
   @Inject
   TransferPanacheRepository transferPanacheRepository;
   @Inject
-  TransferDbMapper transferDbMapper;
+  TransferEntityMapper transferEntityMapper;
 
   @Override
   public Optional<Transfer> findByUuid(String uuid) {
     return transferPanacheRepository.findByUuid(uuid)
-      .map(transferDbMapper::toTransfer);
+      .map(transferEntityMapper::toTransfer);
   }
 
   @Override
   public Set<Transfer> findBySourceStorage(String sourceStorageUUID) {
     return transferPanacheRepository.findBySourceStorage(sourceStorageUUID).stream()
-      .map(transferDbMapper::toTransfer)
+      .map(transferEntityMapper::toTransfer)
       .collect(Collectors.toSet());
   }
 
   @Override
   public Transfer save(Transfer transfer) {
-    TransferEntity transferEntity = transferDbMapper.toTransferEntity(transfer);
+    TransferEntity transferEntity = transferEntityMapper.toTransferEntity(transfer);
     transferPanacheRepository.persist(transferEntity);
-    return transferDbMapper.toTransfer(transferEntity);
+    return transferEntityMapper.toTransfer(transferEntity);
   }
 }

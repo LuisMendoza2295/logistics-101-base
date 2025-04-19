@@ -1,18 +1,18 @@
-package com.logistics.base.repository.mapper;
+package com.logistics.base.infrastructure.persistence.mapper;
 
 import com.logistics.base.domain.model.Stock;
-import com.logistics.base.repository.entity.StockEntity;
+import com.logistics.base.infrastructure.persistence.entity.StockEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
-public class StockDbMapper {
+public class StockEntityMapper {
 
   @Inject
-  ProductDbMapper productDbMapper;
+  ProductEntityMapper productEntityMapper;
 
   @Inject
-  StorageUniDbMapper storageUniDbMapper;
+  StorageUnitEntityMapper storageUnitEntityMapper;
 
   public StockEntity toStockEntity(Stock stock) {
     StockEntity temp = new StockEntity();
@@ -21,9 +21,9 @@ public class StockDbMapper {
     StockEntity stockEntity = temp.getAttachedEntity();
     stockEntity.setBarcode(stock.barcode());
     stockEntity.setExpirationDate(stock.expirationDate());
-    stockEntity.setProduct(productDbMapper.toProductEntity(stock.product()));
+    stockEntity.setProduct(productEntityMapper.toProductEntity(stock.product()));
     if (stock.storageUnit() != null) {
-      stockEntity.setStorageUnit(storageUniDbMapper.toStorageUnitEntity(stock.storageUnit()));
+      stockEntity.setStorageUnit(storageUnitEntityMapper.toStorageUnitEntity(stock.storageUnit()));
     }
     return stockEntity;
   }
@@ -34,10 +34,10 @@ public class StockDbMapper {
       .barcode(stockEntity.barcode())
       .expirationDate(stockEntity.expirationDate());
     if (stockEntity.product() != null) {
-      builder.product(productDbMapper.toProduct(stockEntity.product()));
+      builder.product(productEntityMapper.toProduct(stockEntity.product()));
     }
     if (stockEntity.storageUnit() != null) {
-      builder.storageUnit(storageUniDbMapper.toStorageUnit(stockEntity.storageUnit()));
+      builder.storageUnit(storageUnitEntityMapper.toStorageUnit(stockEntity.storageUnit()));
     }
     return builder.build();
   }

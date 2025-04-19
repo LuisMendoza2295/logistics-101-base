@@ -1,0 +1,1 @@
+INSERT INTO products (uuid, name, grossweight, netweight, width, height, length) VALUES ('9957f784-74c5-46ed-92bb-22d0e8c9d281', 'Test product', 0.15, 0.12, 0.1, 0.2, 0.3);

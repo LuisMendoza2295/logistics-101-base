@@ -1,18 +1,18 @@
-package com.logistics.base.repository.mapper;
+package com.logistics.base.infrastructure.persistence.mapper;
 
 import com.logistics.base.domain.model.Dimensions;
 import com.logistics.base.domain.model.StorageUnit;
-import com.logistics.base.repository.entity.StorageUnitEntity;
+import com.logistics.base.infrastructure.persistence.entity.StorageUnitEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.util.HashMap;
 
 @ApplicationScoped
-public class StorageUniDbMapper {
+public class StorageUnitEntityMapper {
 
   @Inject
-  ProductDbMapper productDbMapper;
+  ProductEntityMapper productEntityMapper;
 
   public StorageUnitEntity toStorageUnitEntity(StorageUnit storageUnit) {
     StorageUnitEntity temp = new StorageUnitEntity();
@@ -32,7 +32,7 @@ public class StorageUniDbMapper {
     storageUnitEntity.setProductsWithQty(new HashMap<>());
     storageUnit.productsWithQty()
       .forEach(
-        (product, qty) -> storageUnitEntity.addProductWithQty(productDbMapper.toProductEntity(product), qty)
+        (product, qty) -> storageUnitEntity.addProductWithQty(productEntityMapper.toProductEntity(product), qty)
       );
     return storageUnitEntity;
   }
@@ -54,7 +54,7 @@ public class StorageUniDbMapper {
       .storageStatus(storageUnitEntity.storageStatus());
     storageUnitEntity.productsWithQty()
       .forEach(
-        (productEntity, qty) -> builder.addProduct(productDbMapper.toProduct(productEntity), qty)
+        (productEntity, qty) -> builder.addProduct(productEntityMapper.toProduct(productEntity), qty)
       );
     return builder.build();
   }

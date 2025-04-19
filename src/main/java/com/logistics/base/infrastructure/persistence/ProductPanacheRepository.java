@@ -1,6 +1,6 @@
-package com.logistics.base.repository.panache;
+package com.logistics.base.infrastructure.persistence;
 
-import com.logistics.base.repository.entity.ProductEntity;
+import com.logistics.base.infrastructure.persistence.entity.ProductEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -24,7 +24,7 @@ public class ProductPanacheRepository implements PanacheRepository<ProductEntity
       .collect(Collectors.toSet());
   }
 
-  public Set<ProductEntity> findByProductUUID(Set<String> productUUIDs) {
+  public Set<ProductEntity> findByProductUUIDs(Set<String> productUUIDs) {
     return find("uuid in ?1", productUUIDs).stream()
       .collect(Collectors.toSet());
   }

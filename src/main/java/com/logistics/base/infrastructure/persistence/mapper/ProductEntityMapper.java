@@ -1,12 +1,12 @@
-package com.logistics.base.repository.mapper;
+package com.logistics.base.infrastructure.persistence.mapper;
 
 import com.logistics.base.domain.model.Dimensions;
 import com.logistics.base.domain.model.Product;
-import com.logistics.base.repository.entity.ProductEntity;
+import com.logistics.base.infrastructure.persistence.entity.ProductEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class ProductDbMapper {
+public class ProductEntityMapper {
 
   public ProductEntity toProductEntity(Product product) {
     ProductEntity temp = new ProductEntity();

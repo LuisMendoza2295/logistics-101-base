@@ -1,6 +1,6 @@
-package com.logistics.base.repository.panache;
+package com.logistics.base.infrastructure.persistence;
 
-import com.logistics.base.repository.entity.TransferEntity;
+import com.logistics.base.infrastructure.persistence.entity.TransferEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 

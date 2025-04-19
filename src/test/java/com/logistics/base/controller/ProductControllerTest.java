@@ -1,6 +1,5 @@
 package com.logistics.base.controller;
 
-import com.logistics.base.controller.dto.ProductDTO;
 import com.logistics.base.controller.mapper.ProductWebMapper;
 import com.logistics.base.controller.mapper.StockWebMapper;
 import com.logistics.base.domain.aggregate.LogisticAggregate;
@@ -13,8 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.logistics.base.util.TestUtils.PRODUCT;
 import static com.logistics.base.util.TestUtils.PRODUCT_UUID;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @QuarkusComponentTest
@@ -37,9 +35,9 @@ public class ProductControllerTest {
 
     Response response = productController.getProduct(PRODUCT_UUID.toString());
 
-    assertNotNull(response);
-    assertNotNull(response.getEntity());
-    ProductDTO responseBody = (ProductDTO) response.getEntity();
-    assertEquals(PRODUCT_UUID.toString(), responseBody.uuid());
+    assertThat(response)
+            .isNotNull()
+            .extracting(Response::getStatus, Response::getEntity)
+            .containsExactly(200, productWebMapper.toProductDTO(PRODUCT));
   }
 }

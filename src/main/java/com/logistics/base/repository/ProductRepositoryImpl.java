@@ -2,9 +2,9 @@ package com.logistics.base.repository;
 
 import com.logistics.base.domain.model.Product;
 import com.logistics.base.domain.repository.ProductRepository;
-import com.logistics.base.repository.entity.ProductEntity;
-import com.logistics.base.repository.mapper.ProductDbMapper;
-import com.logistics.base.repository.panache.ProductPanacheRepository;
+import com.logistics.base.infrastructure.persistence.entity.ProductEntity;
+import com.logistics.base.infrastructure.persistence.mapper.ProductEntityMapper;
+import com.logistics.base.infrastructure.persistence.ProductPanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -18,49 +18,49 @@ public class ProductRepositoryImpl implements ProductRepository {
   @Inject
   ProductPanacheRepository productPanacheRepository;
   @Inject
-  ProductDbMapper productDbMapper;
+  ProductEntityMapper productEntityMapper;
 
   @Override
   public Optional<Product> findByUuid(String uuid) {
     return productPanacheRepository.findByUuid(uuid)
-      .map(productDbMapper::toProduct);
+      .map(productEntityMapper::toProduct);
   }
 
   @Override
   public Optional<Product> findByName(String name) {
     return productPanacheRepository.findByName(name)
-      .map(productDbMapper::toProduct);
+      .map(productEntityMapper::toProduct);
   }
 
   @Override
   public Set<Product> findByProductName(String productName) {
     return productPanacheRepository.findByProductName(productName).stream()
-      .map(productDbMapper::toProduct)
+      .map(productEntityMapper::toProduct)
       .collect(Collectors.toSet());
   }
 
   @Override
   public Set<Product> findByProductUUID(Set<String> productUUIDs) {
-    return productPanacheRepository.findByProductUUID(productUUIDs).stream()
-      .map(productDbMapper::toProduct)
+    return productPanacheRepository.findByProductUUIDs(productUUIDs).stream()
+      .map(productEntityMapper::toProduct)
       .collect(Collectors.toSet());
   }
 
   @Override
   public Product save(Product product) {
-    ProductEntity productEntity = productDbMapper.toProductEntity(product);
+    ProductEntity productEntity = productEntityMapper.toProductEntity(product);
     productPanacheRepository.persist(productEntity);
-    return productDbMapper.toProduct(productEntity);
+    return productEntityMapper.toProduct(productEntity);
   }
 
   @Override
   public Set<Product> saveAll(Set<Product> products) {
     Set<ProductEntity> productEntities = products.stream()
-      .map(product -> productDbMapper.toProductEntity(product))
+      .map(product -> productEntityMapper.toProductEntity(product))
       .collect(Collectors.toSet());
     productPanacheRepository.persist(productEntities);
     return productEntities.stream()
-      .map(productEntity -> productDbMapper.toProduct(productEntity))
+      .map(productEntity -> productEntityMapper.toProduct(productEntity))
       .collect(Collectors.toSet());
   }
 }
