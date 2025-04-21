@@ -45,35 +45,8 @@ compileTestJava {
     options.encoding = 'UTF-8'
 }
 
-//configurations {
-//    integrationTestCompile.extendsFrom testCompile
-//    integrationTestRuntime.extendsFrom testRuntime
-//    integrationTestImplementation.extendsFrom testImplementation
-//    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-//}
-//
-//sourceSets {
-//    integrationTest {
-//        java {
-//            compileClasspath += main.output + test.output
-//            runtimeClasspath += main.output + test.output
-//            srcDir file('src/integrationTest/java')
-//        }
-//        resources.srcDir file('src/integrationTest/resources')
-//    }
-//}
-//
-//tasks.register('integrationTest', Test) {
-//    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-//    classpath = sourceSets.integrationTest.runtimeClasspath
-//}
-
-
 tasks.named('quarkusIntTest') {
-    // Configuraciones adicionales
     classpath += files('src/integrationTest/resources')
     systemProperty 'quarkus.config.locations', 'src/integrationTest/resources/application.properties'
     systemProperty 'quarkus.profile', 'integration'
-    // Otras configuraciones que necesites
-
 }

@@ -1,0 +1,9 @@
+{
+  "uuid": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "Sample Product 1",
+  "height": 0.5,
+  "width": 0.2,
+  "length": 0.75,
+  "netWeight": 0.5,
+  "grossWeight": 0.6
+}
